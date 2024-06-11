@@ -51,6 +51,40 @@ def compute_log_spectrogram(wav_path, frame_size=2048, hop_size=512):
     except Exception as e:
         print(f"Произошла ошибка: {e}")
         return None, None, None, None
+    
+def create_spectogram_per_second(wav_path, segment_length=2048, overlap=512):
+    # Загрузка аудиофайла
+    sample_rate, samples = wavfile.read(wav_path)
+    # Усреднение данных из обоих каналов
+    mono_samples = np.mean(samples, axis=1)
+
+    # Разделение аудиофайла на сегменты
+    segment_length = 2048
+    overlap = 512
+    num_segments = len(mono_samples) // overlap - 1
+
+    # Вычисление спектра для каждого сегмента
+    spectrogram = []
+    for i in range(num_segments):
+        segment = mono_samples[i * overlap: i * overlap + segment_length]
+        spectrum = np.abs(np.fft.fft(segment))[:segment_length//2]
+        spectrogram.append(spectrum)
+
+    # Преобразование списка в numpy массив
+    spectrogram = np.array(spectrogram)
+
+    time_bins_per_second = sample_rate // overlap
+    average_spectrogram = []
+
+    for i in range(0, len(spectrogram), time_bins_per_second):
+        avg_spectrum = np.mean(spectrogram[i:i + time_bins_per_second], axis=0)
+        average_spectrogram.append(avg_spectrum)
+
+    # Преобразование списка в numpy массив
+    average_spectrogram = np.array(average_spectrogram)
+    
+    return average_spectrogram
+
 
 def max_filter(spectrogram, window_size=3):
     """
@@ -184,7 +218,7 @@ def form_pairs(peaks, time_window=50, freq_window=20):
     return pairs
 
 def test():
-    wav_path = 'test3.wav'
+    wav_path = 'D:/hackaton/xk7-retail-group/test2.wav'
     # Пример использования
     start = time.time()
     log_spectrogram, sample_rate, frames_count, freq_count = compute_log_spectrogram(wav_path)
@@ -201,5 +235,22 @@ def test():
     print('Время работы в миллисекундах: ', res_msec)
     plot_spectrogram(n_spectrogram, sample_rate, frames_count, freq_count)
 
+def test_per_second_spectr():
+    wav_path = 'D:/hackaton/xk7-retail-group/test29.wav'
+    # Пример использования
+    start = time.time()
+    spectr_per_sec = create_spectogram_per_second(wav_path)
+    filtered_spectrogram = max_filter(spectr_per_sec)
+    compare_filtered_spectrogram, non_zero_coords = compared_filter(spectr_per_sec, filtered_spectrogram)
+    n_spectrogram = select_uniform_points(compare_filtered_spectrogram, len(non_zero_coords) // 4, non_zero_coords)
+
+    peaks_mask = find_peaks(n_spectrogram, threshold_ratio=0.8)
+    pairs = form_pairs(peaks_mask)
+    hashes = generate_hashes(pairs)
+    finish = time.time()
+    res = finish - start
+    res_msec = int(res * 1000)
+    print('Время работы в миллисекундах: ', res_msec)
+
 if __name__ == "__main__":
-    test()
+    test_per_second_spectr()
