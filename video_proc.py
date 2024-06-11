@@ -20,4 +20,4 @@ def preprocess_video(video_path, width=144, height=176, fps=4):
     # Децимация по времени
     downsampled_frames = frames[::int(cap.get(cv2.CAP_PROP_FPS) / fps)]
     
-    return downsampled_frames
+    return downsampled_frames 
