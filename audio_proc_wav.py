@@ -53,28 +53,22 @@ def compute_log_spectrogram(audio_samples: np.ndarray, sample_rate: int, frame_s
 
 def apply_maximum_filter(spectrogram, size_window):
     """
-    Фильтрация точек за счет оставления пиков после сравнения с исходной спектрограммой
+    Применение фильтрации точек за счет оставления пиков после сравнения с исходной спектрограммой
 
-    Параметры:
-        spectrogram (np.ndarray): Логарифмическая спектрограмма исходная
-        spectrogram_max_filtered (np.ndarray): Логарифмическая спектрограмма после max-pooling'a
-
-    Возвращает:
-        filtered_spectrogram - отфильтрованная спектрограмма
-        non_zero_coords - координаты оставшихся точек
+    :param spectrogram: логарифмическая спектрограмма
+    :param size_window: размер окна
+    :return filtered_spectrogram: отфильтрованная спектограмма
     """
-    filtered_spectrogram = np.zeros_like(spectrogram, dtype=np.float32)
-    # Размеры спектрограммы
-    num_frames, num_bins = spectrogram.shape
-    non_zero_coords = []
-    for i in range(num_frames):
-        for j in range(num_bins):
-            if spectrogram[i, j] == spectrogram_max_filtered[i ,j]:
-                filtered_spectrogram[i, j] = spectrogram[i, j]
-                non_zero_coords.append((i, j))
-    
-    return filtered_spectrogram, non_zero_coords
 
+    # Применение фильтра максимумов размером kxk к логарифмической спектрограмме.
+    filtered_spectrogram = maximum_filter(spectrogram, size=size_window, mode='constant')
+
+    mask = spectrogram == filtered_spectrogram
+
+    # Применение маски для создания отфильтрованной спектрограммы
+    filtered_spectrogram = np.where(mask, spectrogram, 0).astype(np.float32)
+
+    return filtered_spectrogram
 
 
 def find_peaks(arr, threshold_ratio=0.8, neighborhood_size=20):
