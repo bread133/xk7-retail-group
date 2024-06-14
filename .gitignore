@@ -1,7 +1,7 @@
-__pycache__/
-WebApi/__pycache__/
-WebApi/Common/__pycache__/
-WebApi/Model/__pycache__/
-.venv/
-.idea/
+/__pycache__/
+/WebApi/__pycache__/
+/WebApi/Common/__pycache__/
+/WebApi/Model/__pycache__/
+/.venv/
+/.idea/
 /WebApi/.idea/
