@@ -22,35 +22,32 @@ def compute_log_spectrogram(audio_samples: np.ndarray, sample_rate: int, frame_s
     :return freq_count: Количество частотных бинов в логарифмической спектрограмме.
     """
     try:
-        # Загрузка WAV файла
-        sample_rate, samples = wavfile.read(wav_path)
-        if len(samples.shape) > 1:  # Если стерео, взять только первый канал
-            samples = samples[:, 0]
-        
-        # Преобразование одномерных аудиоданных в фреймы
-        frames = np.array([samples[i:i+frame_size].astype(np.float32) 
-                           for i in range(0, len(samples) - frame_size, hop_size)])
-        
+        if len(audio_samples.shape) > 1:  # Если стерео, взять только первый канал
+            audio_samples = audio_samples[:, 0]
+
+        num_frames = (len(audio_samples) - frame_size) // hop_size + 1
+
         # Применение окна Хэннинга к каждому фрейму
         window = np.hanning(frame_size)
-        frames *= window
-        
-        # Вычисление спектрограммы
-        spectrogram = np.abs(np.fft.rfft(frames, n=frame_size))
-        power_spectrum = spectrogram ** 2
-        log_spectrogram = 10 * np.log10(power_spectrum)
-        
+
+        log_spectrogram = []
+
+        for i in range(num_frames):
+            frame = audio_samples[i * hop_size:i * hop_size + frame_size].astype(np.float32)
+            frame *= window
+            spectrogram = np.abs(np.fft.rfft(frame, n=frame_size))
+            power_spectrum = spectrogram ** 2
+            log_spectrogram.append(10 * np.log10(power_spectrum))
+
+        log_spectrogram = np.array(log_spectrogram)
+
         return log_spectrogram, sample_rate, log_spectrogram.shape[0], log_spectrogram.shape[1]
-        
-    except FileNotFoundError:
-        print(f"Файл не найден: {wav_path}")
-        return None, None, None, None
+
     except ValueError as ve:
         print(f"Ошибка значения: {ve}")
-        return None, None, None, None
+
     except Exception as e:
         print(f"Произошла ошибка: {e}")
-        return None, None, None, None
     
 def create_spectogram_per_second(wav_path, segment_length=2048, overlap=512):
     # Загрузка аудиофайла
