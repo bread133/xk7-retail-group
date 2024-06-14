@@ -1,7 +1,10 @@
+import time
 import hashlib
 import numpy as np
 from scipy.ndimage import maximum_filter
 from sklearn.neighbors import KDTree
+from audio_utility import get_audio_duration
+from default_logger import logger
 
 
 def compute_log_spectrogram(audio_samples: np.ndarray, sample_rate: int, frame_size=2048, hop_size=512) \
@@ -151,6 +154,35 @@ def generate_hashes(pairs, duration):
         time_a = int((time_a - min_duration_ds) / step)
 
         result_hashes.append((hash_hex, time_a))
+
+    return result_hashes
+
+
+def create_audio_hashes(audio_samples: np.ndarray, sample_rate: int, frame_size=2048, hop_size=512, size_window=3,
+                          threshold_ratio=0.8, neighborhood_size=20, time_window=50, freq_window=20)\
+        -> list[tuple[str, int]]:
+
+    duration_audio_ms = int(get_audio_duration(audio_samples, sample_rate) * 1000)
+
+    start_time = time.time()
+    spectrogram, _, _, _ = compute_log_spectrogram(audio_samples, sample_rate, frame_size=frame_size, hop_size=hop_size)
+    logger.debug(f'created spectrogram (shape: {spectrogram.shape}); done: {time.time() - start_time} seconds')
+
+    start_time = time.time()
+    filtered_spectrogram = apply_maximum_filter(spectrogram, size_window=size_window)
+    logger.debug(f'applied maximum filter (shape: {filtered_spectrogram.shape}); done: {time.time() - start_time} seconds')
+
+    start_time = time.time()
+    peaks_mask = find_peaks(filtered_spectrogram, threshold_ratio=threshold_ratio, neighborhood_size=neighborhood_size)
+    logger.debug(f'found peak mask; done: {time.time() - start_time} seconds')
+
+    start_time = time.time()
+    pairs = make_pairs(peaks_mask, time_window=time_window, freq_window=freq_window)
+    logger.debug(f'found {len(pairs)} pairs; done: {time.time() - start_time} seconds')
+
+    start_time = time.time()
+    result_hashes = generate_hashes(pairs, duration=duration_audio_ms)
+    logger.debug(f'generated {len(result_hashes)} hashes; done: {time.time() - start_time} seconds')
 
     return result_hashes
 
