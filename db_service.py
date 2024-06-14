@@ -1,18 +1,14 @@
 import time
-import logging
-import psycopg2 as psql
+import numpy
 import psycopg2.pool
+import psycopg2
 from psycopg2.extras import execute_values
 from psycopg2.extras import LoggingConnection, LoggingCursor
+from psycopg2.extensions import register_adapter, AsIs
 from typing import Tuple
+from default_logger import logger
 
-logger = logging.getLogger('log')
-logger.setLevel(logging.DEBUG)
-
-stream = logging.StreamHandler()
-stream.setLevel(logging.DEBUG)
-
-logger.addHandler(stream)
+register_adapter(numpy.int64, AsIs)
 
 
 class MyLoggingCursor(LoggingCursor):
@@ -81,8 +77,8 @@ class DBService:
         :param max_conn: the maximum number of connections,
         :param config: connection parameters.
         """
-        self.pool = psql.pool.SimpleConnectionPool(min_conn, max_conn,
-                                                   connection_factory=MyLoggingConnection, **config)
+        self.pool = psycopg2.pool.SimpleConnectionPool(min_conn, max_conn,
+                                                       connection_factory=MyLoggingConnection, **config)
 
     def add_content(self, title, duration) -> int:
         """
@@ -308,6 +304,7 @@ class DBService:
         query = """ SELECT id_content, timestamp, hash
                     FROM snapshot_audio
                     WHERE hash IN %s
+                    
                 """
 
         data = []
