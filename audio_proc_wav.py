@@ -16,11 +16,10 @@ def compute_log_spectrogram(audio_samples: np.ndarray, sample_rate: int, frame_s
     :param frame_size: Размер каждого фрейма для FFT. По умолчанию 2048.
     :param hop_size: Шаг между фреймами. По умолчанию 512.
 
-    Возвращает:
-        log_spectrogram (np.ndarray): Логарифмическая спектрограмма.
-        sample_rate (int): Частота дискретизации аудиофайла.
-        frames_count (int): Количество фреймов в логарифмической спектрограмме.
-        freq_count (int): Количество частотных бинов в логарифмической спектрограмме.
+    :return log_spectrogram: Логарифмическая спектрограмма.
+    :return sample_rate: Частота дискретизации аудиофайла.
+    :return frames_count: Количество фреймов в логарифмической спектрограмме.
+    :return freq_count: Количество частотных бинов в логарифмической спектрограмме.
     """
     try:
         # Загрузка WAV файла
