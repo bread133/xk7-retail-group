@@ -184,8 +184,4 @@ def create_audio_hashes(audio_samples: np.ndarray, sample_rate: int, frame_size=
     result_hashes = generate_hashes(pairs, duration=duration_audio_ms)
     logger.debug(f'generated {len(result_hashes)} hashes; done: {time.time() - start_time} seconds')
 
-    return result_hashes
-
-
-if __name__ == "__main__":
-    
+    return result_hashes    
