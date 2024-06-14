@@ -1,5 +1,5 @@
 import string
-from HttpStatusCodes import HttpStatusErrorCode
+from Common.HttpStatusCodes import HttpStatusErrorCode
 
 class Fault(Exception):
     code: int
