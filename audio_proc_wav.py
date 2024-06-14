@@ -122,40 +122,6 @@ def form_pairs(peaks, time_window=50, freq_window=20):
     
     return pairs
 
-def test():
-    wav_path = 'D:/hackaton/xk7-retail-group/test2.wav'
-    # Пример использования
-    start = time.time()
-    log_spectrogram, sample_rate, frames_count, freq_count = compute_log_spectrogram(wav_path)
-    filtered_spectrogram = max_filter(log_spectrogram)
-    compare_filtered_spectrogram, non_zero_coords = compared_filter(log_spectrogram, filtered_spectrogram)
-    n_spectrogram = select_uniform_points(compare_filtered_spectrogram, len(non_zero_coords) // 4, non_zero_coords)
-
-    peaks_mask = find_peaks(n_spectrogram, threshold_ratio=0.8)
-    pairs = form_pairs(peaks_mask)
-    hashes = generate_hashes(pairs)
-    finish = time.time()
-    res = finish - start
-    res_msec = int(res * 1000)
-    print('Время работы в миллисекундах: ', res_msec)
-    plot_spectrogram(n_spectrogram, sample_rate, frames_count, freq_count)
-
-def test_per_second_spectr():
-    wav_path = 'D:/hackaton/xk7-retail-group/test29.wav'
-    # Пример использования
-    start = time.time()
-    spectr_per_sec = create_spectogram_per_second(wav_path)
-    filtered_spectrogram = max_filter(spectr_per_sec)
-    compare_filtered_spectrogram, non_zero_coords = compared_filter(spectr_per_sec, filtered_spectrogram)
-    n_spectrogram = select_uniform_points(compare_filtered_spectrogram, len(non_zero_coords) // 4, non_zero_coords)
-
-    peaks_mask = find_peaks(n_spectrogram, threshold_ratio=0.8)
-    pairs = form_pairs(peaks_mask)
-    hashes = generate_hashes(pairs)
-    finish = time.time()
-    res = finish - start
-    res_msec = int(res * 1000)
-    print('Время работы в миллисекундах: ', res_msec)
 
 if __name__ == "__main__":
     test_per_second_spectr()
