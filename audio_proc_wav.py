@@ -1,3 +1,4 @@
+import hashlib
 import numpy as np
 from scipy.ndimage import maximum_filter
 from sklearn.neighbors import KDTree
@@ -120,6 +121,39 @@ def make_pairs(peaks, time_window=50, freq_window=20):
     return pairs
 
 
+def generate_hashes(pairs, duration):
+    """
+    Функция для формирования хэш слепка для пар точек.
+    
+    :param pairs: список пар точек с ((t1, f1), (t2, f2))
+    
+    :return result_hashes: спиок хэш сплепков для каждой пары и время якороной точки A
+    """
+    min_duration_ds = pairs[0][0][0]
+    max_duration_ds = pairs[-1][0][0]
+    step = ((max_duration_ds - min_duration_ds) / duration)
+
+    result_hashes = []
+    for pair in pairs:
+
+        point_a, point_b = pair
+        time_a, freq_a = point_a
+        time_b, freq_b = point_b
+
+        # Key generation from frequencies and time difference
+        key = f"{freq_a}-{freq_b}-{time_b - time_a}"
+
+        # Create hash value
+        hash_object = hashlib.sha256(key.encode())
+        hash_hex = hash_object.hexdigest()
+
+        # Convert to milliseconds
+        time_a = int((time_a - min_duration_ds) / step)
+
+        result_hashes.append((hash_hex, time_a))
+
+    return result_hashes
+
 
 if __name__ == "__main__":
-    test_per_second_spectr()
+    
