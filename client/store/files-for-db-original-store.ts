@@ -10,7 +10,7 @@ import { MAX_N_FILES_TO_UPLOAD } from '@/consts'
 import { validateFileSize, validateFileType } from '@/lib/utils'
 import { useBorrowingStore } from '@/store/borrowing-store'
 
-interface FilesState {
+interface FilesForDbOriginalStore {
   filesZus: IFile[]
   isLoading: boolean
   errors: string[]
@@ -18,7 +18,7 @@ interface FilesState {
   setProgress: (fileId: string, progress: number) => void
 }
 
-export const useFilesStore = create<FilesState>()(
+export const useFilesForDbOriginalStore = create<FilesForDbOriginalStore>()(
   devtools((set, get) => ({
     filesZus: [],
     isLoading: false,
@@ -77,7 +77,7 @@ export const useFilesStore = create<FilesState>()(
           useBorrowingStore.getState().addVideoBorrowings(item.borrowing)
         })
 
-        toast.success('Все файлы успешно загружены')
+        toast.success('Файлы успешно загружены')
       } catch (error) {
         // убрать лишние файлы с ошибкой, хотя  можно и другую логику добавить
         if (error instanceof AxiosError) {
@@ -101,14 +101,6 @@ export const useFilesStore = create<FilesState>()(
           file.id === fileId ? { ...file, progress } : file
         )
       }))
-    },
-
-    setIsSuccess: (fileId: string, isSuccess: boolean) => {
-      set((state) => ({
-        filesZus: state.filesZus.map((file) =>
-          file.id === fileId ? { ...file, isSuccess } : file
-        )
-      }))
     }
   }))
 )
@@ -119,12 +111,12 @@ const uploadFilesAll = async (
   validFiles: IFile[],
   setProgress: (fileId: string, progress: number) => void
 ) => {
-  const uploadPromises = validFiles.map(async (file) => {
-    return await uploadFile({
+  const uploadPromises = validFiles.map((file) => {
+    return uploadFile({
       file,
       fileId: file.id,
       setProgress,
-      url: '/files'
+      url: '/filesOriginal'
     })
   })
   return await Promise.all(uploadPromises)

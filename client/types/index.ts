@@ -7,6 +7,7 @@ export interface IFile {
   previewUrl?: string
   progress: number
   currentFile: File
+  isSuccess?: boolean
 }
 
 export interface IVideoBorrowing {

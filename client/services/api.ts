@@ -8,12 +8,14 @@ interface uploadFileProps {
   file: IFile
   fileId: string
   setProgress: (fileName: string, progress: number) => void
+  url: string
 }
 
 export const uploadFile = async ({
   file,
   fileId,
-  setProgress
+  setProgress,
+  url
 }: uploadFileProps) => {
   const formData = new FormData()
   formData.append('file', file.currentFile)
@@ -22,7 +24,7 @@ export const uploadFile = async ({
 
   try {
     const response: AxiosResponse<IResponseServerUploadFiles> = await $api.post(
-      '/files',
+      url,
       formData,
       {
         onUploadProgress: (progressEvent) => {

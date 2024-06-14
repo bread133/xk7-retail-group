@@ -17,18 +17,19 @@ import { cn } from '@/lib/utils'
 import PlusIcon from '@/assets/plus.svg'
 import { VideoUpload } from '@/components/video-upload'
 import { IFile } from '@/types'
-import { useFilesStore } from '@/store/files-store'
 
 export interface InputProps
-  extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'type'> {}
+  extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'type'> {
+  files: IFile[]
+  isLoading: boolean
+  addFiles: (files: FileList) => void
+}
 
 export const FileInput = forwardRef<HTMLInputElement, InputProps>(
-  ({ className, ...props }, ref) => {
-    const { add, filesZus, isLoading } = useFilesStore()
-
+  ({ className, files, isLoading, addFiles, ...props }, ref) => {
     const [dragActive, setDragActive] = useState<boolean>(false)
 
-    const noInput = filesZus.length === 0
+    const noInput = files.length === 0
 
     // обрабатываем события перетаскивания
     const handleDrag = useCallback(
@@ -45,10 +46,10 @@ export const FileInput = forwardRef<HTMLInputElement, InputProps>(
       async (event: ChangeEvent<HTMLInputElement>) => {
         event.preventDefault()
         if (event.target.files && event.target.files[0]) {
-          add(event.target.files)
+          addFiles(event.target.files)
         }
       },
-      [add]
+      [addFiles]
     )
 
     // срабатывает при dropped
@@ -58,18 +59,21 @@ export const FileInput = forwardRef<HTMLInputElement, InputProps>(
         event.stopPropagation()
         if (event.dataTransfer.files && event.dataTransfer.files[0]) {
           setDragActive(false)
-          add(event.dataTransfer.files)
+          addFiles(event.dataTransfer.files)
           event.dataTransfer.clearData()
         }
       },
-      [add]
+      [addFiles]
     )
 
     return (
       <form
         onSubmit={(e) => e.preventDefault()}
         onDragEnter={handleDrag}
-        className='flex h-full items-center w-full lg:w-2/3 justify-start'
+        className={cn(
+          'flex h-full items-center w-full lg:w-2/3 justify-start',
+          className
+        )}
       >
         <label
           htmlFor='dropzone-file'
@@ -172,7 +176,7 @@ export const FileInput = forwardRef<HTMLInputElement, InputProps>(
                           </tr>
                         </thead>
                         <tbody className='relative divide-y dark:divide-slate-600'>
-                          {filesZus.map((file: IFile) => {
+                          {files.map((file: IFile) => {
                             return (
                               <VideoUpload
                                 key={file.id}
