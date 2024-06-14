@@ -91,7 +91,7 @@ def find_peaks(spectrogram, threshold_ratio=0.8, neighborhood_size=20):
     detected_peaks = (arr > threshold) & local_max
     return detected_peaks
 
-def form_pairs(peaks, time_window=50, freq_window=20):
+def make_pairs(peaks, time_window=50, freq_window=20):
     """
     Функция для формирования пар опорных и целевых точек из target-зоны.
 
