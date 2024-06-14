@@ -94,14 +94,12 @@ def find_peaks(spectrogram, threshold_ratio=0.8, neighborhood_size=20):
 def form_pairs(peaks, time_window=50, freq_window=20):
     """
     Функция для формирования пар опорных и целевых точек из target-зоны.
-    
-    Параметры:
-    - peaks: двумерный логический массив пиков
-    - time_window: максимальный временной интервал между anchor и target
-    - freq_window: максимальная частотная разница между anchor и target
-    
-    Возвращает:
-    - pairs: список пар точек ((t1, f1), (t2, f2))
+
+    :param peaks: двумерный логический массив пиков
+    :param time_window: максимальный временной интервал между anchor и target
+    :param freq_window: максимальная частотная разница между anchor и target
+
+    :return pairs: список пар точек ((time_a, freq_a), (time_b, freq_b))
     """
     # Получим координаты пиков
     peak_coords = np.argwhere(peaks)
