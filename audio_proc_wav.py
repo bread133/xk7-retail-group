@@ -51,7 +51,7 @@ def compute_log_spectrogram(audio_samples: np.ndarray, sample_rate: int, frame_s
     
 
 
-def compared_filter(spectrogram, spectrogram_max_filtered):
+def apply_maximum_filter(spectrogram, size_window):
     """
     Фильтрация точек за счет оставления пиков после сравнения с исходной спектрограммой
 
