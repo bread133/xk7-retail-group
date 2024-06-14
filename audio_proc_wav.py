@@ -49,38 +49,6 @@ def compute_log_spectrogram(audio_samples: np.ndarray, sample_rate: int, frame_s
     except Exception as e:
         print(f"Произошла ошибка: {e}")
     
-def create_spectogram_per_second(wav_path, segment_length=2048, overlap=512):
-    # Загрузка аудиофайла
-    sample_rate, samples = wavfile.read(wav_path)
-    # Усреднение данных из обоих каналов
-    mono_samples = np.mean(samples, axis=1)
-
-    # Разделение аудиофайла на сегменты
-    segment_length = 2048
-    overlap = 512
-    num_segments = len(mono_samples) // overlap - 1
-
-    # Вычисление спектра для каждого сегмента
-    spectrogram = []
-    for i in range(num_segments):
-        segment = mono_samples[i * overlap: i * overlap + segment_length]
-        spectrum = np.abs(np.fft.fft(segment))[:segment_length//2]
-        spectrogram.append(spectrum)
-
-    # Преобразование списка в numpy массив
-    spectrogram = np.array(spectrogram)
-
-    time_bins_per_second = sample_rate // overlap
-    average_spectrogram = []
-
-    for i in range(0, len(spectrogram), time_bins_per_second):
-        avg_spectrum = np.mean(spectrogram[i:i + time_bins_per_second], axis=0)
-        average_spectrogram.append(avg_spectrum)
-
-    # Преобразование списка в numpy массив
-    average_spectrogram = np.array(average_spectrogram)
-    
-    return average_spectrogram
 
 
 def max_filter(spectrogram, window_size=3):
