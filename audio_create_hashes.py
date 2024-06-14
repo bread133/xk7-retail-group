@@ -84,12 +84,12 @@ def find_peaks(spectrogram, threshold_ratio=0.8, neighborhood_size=20):
     """
 
     # Normalize spectrogram
-    max_val = np.max(arr)
+    max_val = np.max(spectrogram)
     threshold = threshold_ratio * max_val
     
     # Find local maximums
-    local_max = maximum_filter(arr, size=neighborhood_size) == arr
-    detected_peaks = (arr > threshold) & local_max
+    local_max = maximum_filter(spectrogram, size=neighborhood_size) == spectrogram
+    detected_peaks = (spectrogram > threshold) & local_max
     return detected_peaks
 
 def make_pairs(peaks, time_window=50, freq_window=20):

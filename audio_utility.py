@@ -61,7 +61,7 @@ def get_audio_duration(audio_samples: np.ndarray, sample_rate: int) -> float:
 
 
 def example1(filename_: str):
-	"""
+    """
     Пример. Извлекает аудиодорожку из видеофайла и печатает длительность в секундах.
 
     :param filename_: Путь к видеофайлу.
