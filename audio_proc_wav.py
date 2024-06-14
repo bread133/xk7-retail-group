@@ -71,23 +71,22 @@ def apply_maximum_filter(spectrogram, size_window):
     return filtered_spectrogram
 
 
-def find_peaks(arr, threshold_ratio=0.8, neighborhood_size=20):
+def find_peaks(spectrogram, threshold_ratio=0.8, neighborhood_size=20):
     """
     Функция для поиска пиков в двумерном массиве (спектрограмме).
     
-    Параметры:
-    - arr: двумерный массив (спектрограмма)
-    - threshold_ratio: процент от максимальной амплитуды для порога
-    - neighborhood_size: размер окна для поиска локальных максимумов
+    :param spectrogram: логарифмическая спектрограмма
+    :param threshold_ratio: процент от максимальной амплитуды для порога
+    :param neighborhood_size: размер окна для поиска локальных максимумов
     
-    Возвращает:
-    - detected_peaks: двумерный логический массив, где True обозначает пик
+    :return detected_peaks: двумерный логический массив, где True обозначает пик
     """
-    # Нормализуем спектрограмму
+
+    # Normalize spectrogram
     max_val = np.max(arr)
     threshold = threshold_ratio * max_val
     
-    # Найдем локальные максимумы
+    # Find local maximums
     local_max = maximum_filter(arr, size=neighborhood_size) == arr
     detected_peaks = (arr > threshold) & local_max
     return detected_peaks
