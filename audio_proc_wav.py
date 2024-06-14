@@ -1,10 +1,7 @@
-from scipy.io import wavfile
 import numpy as np
-import time 
-import random
 from scipy.ndimage import maximum_filter
-from utils import *
-from audio_hash import *
+from sklearn.neighbors import KDTree
+
 
 def compute_log_spectrogram(audio_samples: np.ndarray, sample_rate: int, frame_size=2048, hop_size=512) \
         -> tuple[np.ndarray, int, int, int]:
