@@ -6,14 +6,15 @@ from scipy.ndimage import maximum_filter
 from utils import *
 from audio_hash import *
 
-def compute_log_spectrogram(wav_path, frame_size=2048, hop_size=512):
+def compute_log_spectrogram(audio_samples: np.ndarray, sample_rate: int, frame_size=2048, hop_size=512) \
+        -> tuple[np.ndarray, int, int, int]:
     """
     Загружает WAV файл и вычисляет его логарифмическую спектрограмму.
 
-    Параметры:
-        wav_path (str): Путь к WAV файлу.
-        frame_size (int): Размер каждого фрейма для FFT. По умолчанию 2048.
-        hop_size (int): Шаг между фреймами. По умолчанию 512.
+    :param audio_samples: Аудиоданные.
+    :param sample_rate: Частота дискретизации аудиоданных.
+    :param frame_size: Размер каждого фрейма для FFT. По умолчанию 2048.
+    :param hop_size: Шаг между фреймами. По умолчанию 512.
 
     Возвращает:
         log_spectrogram (np.ndarray): Логарифмическая спектрограмма.
