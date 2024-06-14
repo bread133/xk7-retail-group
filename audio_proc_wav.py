@@ -101,17 +101,27 @@ def make_pairs(peaks, time_window=50, freq_window=20):
 
     :return pairs: список пар точек ((time_a, freq_a), (time_b, freq_b))
     """
-    # Получим координаты пиков
-    peak_coords = np.argwhere(peaks)
+
+    # Get coordinates of peaks
+    peak_coordinates = np.argwhere(peaks)
+
+    # Create KD-Tree from peak coordinates
+    tree = KDTree(peak_coordinates)
+
     pairs = []
-    
-    # Для каждой опорной точки найдем целевые точки в заданных окнах
-    for i, (t1, f1) in enumerate(peak_coords):
-        for j, (t2, f2) in enumerate(peak_coords):
-            if i != j and 0 < (t2 - t1) <= time_window and abs(f2 - f1) <= freq_window:
-                pairs.append([(t1, f1), (t2, f2)])
-    
+    # For each peak, look for the nearest points in the given windows
+    for i, (t1, f1) in enumerate(peak_coordinates):
+        # Find points within time_window and freq_window
+        indices = tree.query_radius([[t1, f1]], r=np.sqrt(time_window ** 2 + freq_window ** 2))[0]
+
+        for j in indices:
+            if i != j:
+                t2, f2 = peak_coordinates[j]
+                if 0 < (t2 - t1) <= time_window and abs(f2 - f1) <= freq_window:
+                    pairs.append(((t1, f1), (t2, f2)))
+
     return pairs
+
 
 
 if __name__ == "__main__":
