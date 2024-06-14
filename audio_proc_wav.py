@@ -51,38 +51,6 @@ def compute_log_spectrogram(audio_samples: np.ndarray, sample_rate: int, frame_s
     
 
 
-def max_filter(spectrogram, window_size=3):
-    """
-    Применяет фильтр максимумов размером kxk к логарифмической спектрограмме.
-
-    Параметры:
-        spectrogram (np.ndarray): Логарифмическая спектрограмма.
-        window_size (int): Размер окна
-
-    Возвращает:
-        filtered_spectrogram (np.ndarray): Спектрограмма после применения фильтра максимумов.
-    """
-
-    filtered_spectrogram = np.zeros_like(spectrogram)
-    
-    # Размеры спектрограммы
-    num_frames, num_bins = spectrogram.shape
-    
-    # Половина размера окна для удобства использования при выборе окрестности
-    half_window_size = window_size // 2
-    
-    # Применяем фильтр к каждому пикселю спектрограммы, кроме граничных пикселей
-    for i in range(half_window_size, num_frames - half_window_size):
-        for j in range(half_window_size, num_bins - half_window_size):
-            # Выбираем окрестность с пользовательским размером окна вокруг текущего пикселя
-            neighborhood = spectrogram[i-half_window_size:i+half_window_size+1, j-half_window_size:j+half_window_size+1]
-            # Находим максимальное значение в окрестности
-            max_value = np.max(neighborhood)
-            # Присваиваем максимальное значение текущему пикселю в результате
-            filtered_spectrogram[i, j] = max_value
-    
-    return filtered_spectrogram
-
 def compared_filter(spectrogram, spectrogram_max_filtered):
     """
     Фильтрация точек за счет оставления пиков после сравнения с исходной спектрограммой
@@ -107,34 +75,6 @@ def compared_filter(spectrogram, spectrogram_max_filtered):
     
     return filtered_spectrogram, non_zero_coords
 
-def select_uniform_points(matrix, N, non_zero_coords):
-    """
-    Функция для ограничения пиков спектрограммы до N точек
-
-    Параметры:
-        matrix (np.ndarray): Исходная матрица (спектрограмма)
-        N (int): Число точек, которые надо оставить
-        non_zero_coords: Координаты оставшихся точек
-    Возвращает:
-        N_matrix - Проработанная до N - точек спектрограмма
-    """
-    n, m = matrix.shape
-    
-    # Проверяем, что ненулевых точек больше или равно N
-    if len(non_zero_coords) < N:
-        raise ValueError("Количество ненулевых точек меньше, чем N")
-    
-    # Сэмплирование по Uniform-распеределению N точек из ненулевых координат
-    selected_coords = random.sample(non_zero_coords, N)
-    
-    # Создаем новую матрицу с нулями
-    N_matrix = np.zeros((n, m), dtype=matrix.dtype)
-    
-    # Расставляем выбранные точки в новой матрице
-    for i, j in selected_coords:
-        N_matrix[i, j] = matrix[i, j]
-    
-    return N_matrix
 
 
 def find_peaks(arr, threshold_ratio=0.8, neighborhood_size=20):
