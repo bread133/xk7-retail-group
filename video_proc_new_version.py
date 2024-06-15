@@ -3,8 +3,9 @@ import numpy as np
 from skimage.metrics import structural_similarity as ssim
 from moviepy.editor import VideoFileClip
 import statistics
+from time import time
 
-def resize_and_change_fps(input_path, output_path, new_width, new_height, fps=4):
+def resize_and_change_fps(input_path, output_path, new_width=144, new_height=176, fps=4):
     """
     Функция для изменения размера видео и установки частоты кадров.
 
@@ -157,12 +158,17 @@ def compute_dct_coefficients(B):
     alpha = np.zeros((Height, Width))
     beta = np.zeros((Height, Width))
 
-    # Вычисление коэффициентов
-    for i in range(Height):
-        for j in range(Width):
-            block = B[i, j, :, :]
-            alpha[i, j] = np.dot(np.dot(v, block), np.ones(block_size))
-            beta[i, j]  = np.dot(np.dot(np.ones(block_size), block), v)
+    # # Вычисление коэффициентов
+    # for i in range(Height):
+    #     for j in range(Width):
+    #         block = B[i, j, :, :]
+    #         alpha[i, j] = np.dot(np.dot(v, block), np.ones(block_size))
+    #         beta[i, j]  = np.dot(np.dot(np.ones(block_size), block), v)
+    # Вычисление alpha
+    alpha = np.tensordot(B, np.outer(v, np.ones(block_size)), axes=([2, 3], [0, 1]))
+
+    # Вычисление beta
+    beta = np.tensordot(B, np.outer(np.ones(block_size), v), axes=([2, 3], [0, 1]))
 
     return np.ravel(alpha).tolist(), np.ravel(beta).tolist()
 
@@ -189,40 +195,80 @@ def binary_to_decimal(binary_list):
     
     return decimal_numbers
 
-if __name__ == "__main__":
-    input_file = "D:/hackaton/xk7-retail-group/test_video.mp4"
-    resized_file = "test_video_resized.mp4"
-    resized_file2 = "test_video_resized2.mp4"
-    resize_and_change_fps(input_file, resized_file, new_width=144, new_height=176, fps=10)
-    resize_and_change_fps(input_file, resized_file2, new_width=144, new_height=176, fps=10)
-    tiris, tiri_times = process_video(resized_file, threshold=0.6, J=5)
-    print(f"TirisLen : {len(tiris)}")
-    B = []
-    for tiri in tiris:
-        B.append(segment_Tiri(tiri))
-    print(f"B shape: {B[0].shape}")
-    print(f"BLen : {len(B)}")
-    alpha, beta = compute_dct_coefficients(B[0])
-    f = get_f(alpha, beta)
-    hash1 = hash_frame(f)
-    decimal_hash1 = binary_to_decimal(hash1)
-    print(len(decimal_hash1))
-    print(tiri_times)  # Вывод временных меток
+def create_video_fingerprints(name_file: str, extension='.mp4'):
 
-    tiris, tiri_times = process_video(resized_file2, threshold=0.6, J=5)
-    print(f"TirisLen : {len(tiris)}")
+    name_file += extension
+    resized_file = name_file + '_resized' + extension
+
+    start_time = time()
+    resize_and_change_fps(name_file, resized_file, new_width=124, new_height=156, fps=10)
+    print(f'resized: {time() - start_time} seconds')
+
+    start_time = time()
+    tiris, tiri_times = process_video(resized_file, threshold=0.6, J=5)
+    print(f'created tiris (count: {len(tiris)}): {time() - start_time} seconds')
+
+    start_time = time()
     B = []
     for tiri in tiris:
         B.append(segment_Tiri(tiri))
-    print(f"B shape: {B[0].shape}")
-    print(f"BLen : {len(B)}")
-    alpha, beta = compute_dct_coefficients(B[0])
-    f = get_f(alpha, beta)
-    hash2 = hash_frame(f)
-    decimal_hash2 = binary_to_decimal(hash2)
-    print(len(decimal_hash2))
-    print(tiri_times) 
-    print(hash1 == hash2)
+
+    print(f'created B (count: {len(B)}): {time() - start_time} seconds')
+
+    start_time_cycle = time()
+    hashes = []
+
+    for i in range(len(B)):
+        start_time = time()
+        alpha, beta = compute_dct_coefficients(B[i])
+
+        start_time = time()
+        f = get_f(alpha, beta)
+
+        start_time = time()
+        hash = hash_frame(f)
+        hashes.append(hash)
+
+    print(f'created hashes (count: {len(hashes)}): {time() - start_time_cycle} seconds')
+
+    return hashes
+
+
+if __name__ == "__main__":
+    input_file = "D:/hackaton/xk7-retail-group/h15nvubfgaxb7h45kjng3dv3hu8z2p4b"
+    create_video_fingerprints(input_file)
+    # resized_file = "test_video_resized.mp4"
+    # resized_file2 = "test_video_resized2.mp4"
+    # resize_and_change_fps(input_file, resized_file, new_width=144, new_height=176, fps=10)
+    # resize_and_change_fps(input_file, resized_file2, new_width=144, new_height=176, fps=10)
+    # tiris, tiri_times = process_video(resized_file, threshold=0.6, J=5)
+    # print(f"TirisLen : {len(tiris)}")
+    # B = []
+    # for tiri in tiris:
+    #     B.append(segment_Tiri(tiri))
+    # print(f"B shape: {B[0].shape}")
+    # print(f"BLen : {len(B)}")
+    # alpha, beta = compute_dct_coefficients(B[0])
+    # f = get_f(alpha, beta)
+    # hash1 = hash_frame(f)
+    # decimal_hash1 = binary_to_decimal(hash1)
+    # print(len(decimal_hash1))
+    # print(tiri_times)  # Вывод временных меток
+
+    # tiris, tiri_times = process_video(resized_file2, threshold=0.6, J=5)
+    # print(f"TirisLen : {len(tiris)}")
+    # B = []
+    # for tiri in tiris:
+    #     B.append(segment_Tiri(tiri))
+    # print(f"B shape: {B[0].shape}")
+    # print(f"BLen : {len(B)}")
+    # alpha, beta = compute_dct_coefficients(B[0])
+    # f = get_f(alpha, beta)
+    # hash2 = hash_frame(f)
+    # decimal_hash2 = binary_to_decimal(hash2)
+    # print(type(decimal_hash2))
+    # print(tiri_times) 
+    # print(hash1 == hash2)
     # Пример вывода TIRI изображений
     # for idx, tiri in enumerate(tiris):
     #     print(tiri.shape)
