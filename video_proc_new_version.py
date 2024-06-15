@@ -5,13 +5,12 @@ from moviepy.editor import VideoFileClip
 import statistics
 from time import time
 
-def resize_and_change_fps(input_path, output_path, new_width=144, new_height=176, fps=4):
+def resize_and_change_fps(input_path, new_width=144, new_height=176, fps=4):
     """
     Функция для изменения размера видео и установки частоты кадров.
 
     Параметры:
     - input_path (str): Путь к входному видеофайлу.
-    - output_path (str): Путь к выходному видеофайлу.
     - new_width (int): Новая ширина видео.
     - new_height (int): Новая высота видео.
     - fps (int): Частота кадров в секунду (по умолчанию 4).
@@ -21,48 +20,46 @@ def resize_and_change_fps(input_path, output_path, new_width=144, new_height=176
 
     # Изменение размеров и частоты кадров
     resized_clip = clip.resize(newsize=(new_width, new_height)).set_fps(fps)
+    
+    return resized_clip
 
-    # Сохранение результата
-    resized_clip.write_videofile(output_path, fps=fps)
 
-def extract_keyframes(video_path, threshold=0.6):
-    # Инициализация видеозахвата
-    cap = cv2.VideoCapture(video_path)
-    if not cap.isOpened():
-        print("Ошибка: Не удалось открыть видео.")
-        return []
+def extract_keyframes(resized_clip, threshold=0.6):
+    """
+    Функция для извлечения ключевых кадров из видео.
 
-    fps = cap.get(cv2.CAP_PROP_FPS) 
-    frame_step = fps
-
+    Параметры:
+    - resized_clip (VideoFileClip): Объект VideoFileClip.
+    - threshold (float): Пороговое значение SSIM для определения ключевых кадров.
+    """
+    fps = resized_clip.fps
     key_frames = []
     frame_groups = []
     numGroups = 1
     numScenes = 0
     frame_times = []  # Список для хранения времени ключевых кадров
 
-    # Захват первого кадра
-    ret, prev_frame = cap.read()
+    # Инициализация итератора кадров
+    frames = list(resized_clip.iter_frames())
+    num_frames = len(frames)
 
-    if not ret:
+    # Захват первого кадра
+    if num_frames == 0:
         print("Ошибка: Не удалось прочитать первый кадр.")
         return []
 
-    prev_frame_gray = cv2.cvtColor(prev_frame, cv2.COLOR_BGR2GRAY)
+    prev_frame = frames[0]
+    prev_frame_gray = cv2.cvtColor(prev_frame, cv2.COLOR_RGB2GRAY)
     key_frames.append(prev_frame)
     frame_groups.append([prev_frame])
-    frame_times.append(cap.get(cv2.CAP_PROP_POS_MSEC))  # Добавляем время первого кадра
+    frame_times.append(0)  # Время первого кадра (0 мс)
     frame_count = 0
 
-    while True:
-        ret, curr_frame = cap.read()
-        if not ret:
-            break
+    for frame_idx in range(1, num_frames):
+        curr_frame = frames[frame_idx]
+        frame_time = (frame_idx / fps) * 1000  # Время в миллисекундах
 
-        frame_count += 1
-
-
-        curr_frame_gray = cv2.cvtColor(curr_frame, cv2.COLOR_BGR2GRAY)
+        curr_frame_gray = cv2.cvtColor(curr_frame, cv2.COLOR_RGB2GRAY)
         # Вычисление SSIM между текущим и предыдущим ключевыми кадрами
         ssim_value = ssim(prev_frame_gray, curr_frame_gray)
 
@@ -70,7 +67,7 @@ def extract_keyframes(video_path, threshold=0.6):
             # Если SSIM ниже порогового значения, добавляем новый ключевой кадр
             key_frames.append(curr_frame)
             frame_groups.append([curr_frame])
-            frame_times.append(cap.get(cv2.CAP_PROP_POS_MSEC))  # Добавляем время текущего кадра
+            frame_times.append(frame_time)  # Добавляем время текущего кадра
             prev_frame_gray = curr_frame_gray
             numGroups += 1
             numScenes += 1  # Обновляем количество сцен
@@ -79,7 +76,6 @@ def extract_keyframes(video_path, threshold=0.6):
             # Группируем кадр с последней группой
             frame_groups[-1].append(curr_frame)
 
-    cap.release()
     return key_frames, frame_times
 
 def generate_tiri(frames, J, gamma=0.65):
@@ -201,7 +197,7 @@ def create_video_fingerprints(name_file: str, extension='.mp4'):
     resized_file = name_file + '_resized' + extension
 
     start_time = time()
-    resize_and_change_fps(name_file, resized_file, new_width=124, new_height=156, fps=10)
+    resized_file = resize_and_change_fps(name_file, new_width=145, new_height=176, fps=10)
     print(f'resized: {time() - start_time} seconds')
 
     start_time = time()
@@ -230,13 +226,15 @@ def create_video_fingerprints(name_file: str, extension='.mp4'):
         hashes.append(hash)
 
     print(f'created hashes (count: {len(hashes)}): {time() - start_time_cycle} seconds')
+    print(len(hashes))
+    print(len(tiri_times))
 
-    return hashes
+    return hashes, tiri_times
 
 
 if __name__ == "__main__":
     input_file = "D:/hackaton/xk7-retail-group/h15nvubfgaxb7h45kjng3dv3hu8z2p4b"
-    create_video_fingerprints(input_file)
+    hashes, tiri_times = create_video_fingerprints(input_file)
     # resized_file = "test_video_resized.mp4"
     # resized_file2 = "test_video_resized2.mp4"
     # resize_and_change_fps(input_file, resized_file, new_width=144, new_height=176, fps=10)
