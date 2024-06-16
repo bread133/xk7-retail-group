@@ -197,7 +197,7 @@ def create_video_fingerprints(name_file: str, extension='.mp4'):
     resized_file = name_file + '_resized' + extension
 
     start_time = time()
-    resized_file = resize_and_change_fps(name_file, new_width=145, new_height=176, fps=10)
+    resized_file = resize_and_change_fps(name_file, new_width=144, new_height=176, fps=10)
     print(f'resized: {time() - start_time} seconds')
 
     start_time = time()
@@ -228,14 +228,16 @@ def create_video_fingerprints(name_file: str, extension='.mp4'):
     print(f'created hashes (count: {len(hashes)}): {time() - start_time_cycle} seconds')
     print(len(hashes))
     print(len(tiri_times))
-
-    return hashes, tiri_times
+    hashes_decimal  = map(binary_to_decimal, hashes)
+    hash_times_list = list(zip(hashes_decimal, tiri_times))
+    
+    return hash_times_list
 
 
 if __name__ == "__main__":
     input_file = "D:/hackaton/xk7-retail-group/h15nvubfgaxb7h45kjng3dv3hu8z2p4b"
-    hashes, tiri_times = create_video_fingerprints(input_file)
-    # resized_file = "test_video_resized.mp4"
+    hash_times_list = create_video_fingerprints(input_file)
+    resized_file = "test_video_resized.mp4"
     # resized_file2 = "test_video_resized2.mp4"
     # resize_and_change_fps(input_file, resized_file, new_width=144, new_height=176, fps=10)
     # resize_and_change_fps(input_file, resized_file2, new_width=144, new_height=176, fps=10)
