@@ -30,13 +30,23 @@ app.add_middleware(
 @app.get('/download-submission-file')
 async def get_submission_file(id_video: UUID):
     # достать из бд и показать в submission-файле с расширением - csv
-    pass
+    try:
+        pass
+    except:
+        pass
+    finally:
+        pass
 
 
 @app.get('/show-fingerprint')
 async def get_borrow_table(id_video: UUID):
     # достать из бд и показать в json-табличке
-    pass
+    try:
+        pass
+    except:
+        pass
+    finally:
+        pass
 
 
 @app.post('/api/files')
