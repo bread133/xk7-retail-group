@@ -32,6 +32,9 @@ class UploadVideo(BaseOperation):
             with open(self.path, "wb") as f:
                 content = await file.read()
                 f.write(content)
+            if not os.path.exists(self.path):
+                success = False
+                message = "Could not load file to server"
         except:
             success = False
             message = "Could not load file to server"
