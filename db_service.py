@@ -323,3 +323,80 @@ class DBService:
 
         finally:
             return data
+
+    def add_video_fingerprint(self, hash: list[int], id_content: int, timestamp: int):
+        """
+        Adds a list of video fingerprint data. Function returns nothing.
+
+        :param hash: list with decimal number (number - part of fingerprint).
+        :param id_content: id content.
+        :param timestamp: fingerprint timestamp
+        """
+
+        query = f"""INSERT INTO fingerprint_video("column", row, id_content, timestamp)
+                    VALUES %s;
+                """
+
+        data = [(idx, value, id_content, timestamp) for idx, value in enumerate(hash)]
+
+        try:
+            with ConnectionFromPool(self.pool) as conn:
+                with conn.cursor() as cur:
+                    execute_values(cur, query, data, page_size=100000)
+
+        except (Exception, psycopg2.DatabaseError) as error:
+            logger.error(f'Exception: {error}')
+
+    def add_video_fingerprints(self, hashes: list[tuple[list[int]], int], id_content: int):
+        """
+         Adds a list of video fingerprint data. Function returns nothing. Function returns nothing.
+
+        :param hashes: list with tuple (fingerprint data and fingerprint timestamp).
+        :param id_content: id content.
+        """
+
+        query = f"""INSERT INTO fingerprint_video("column", row, id_content, timestamp)
+                    VALUES %s;
+                """
+
+        data = [(idx, value, id_content, timestamp) for hash, timestamp in hashes for idx, value in enumerate(hash)]
+
+        try:
+            with ConnectionFromPool(self.pool) as conn:
+                with conn.cursor() as cur:
+                    execute_values(cur, query, data, page_size=100000)
+
+        except (Exception, psycopg2.DatabaseError) as error:
+            logger.error(f'Exception: {error}')
+
+    def get_video_fingerprints_by_hash(self, id_content, timestamp_start, timestamp_end) -> list[tuple[int, int, str]]:
+        """
+         Performs a fingerprint search and returns matches from the database.
+
+        :param id_content: id content.
+        :param timestamp_start: start time.
+        :param timestamp_end: start time.
+        :return: list of tuple (‘column’, ‘row’, ‘timestamp’).
+        """
+
+        query = """ SELECT "column",row,timestamp
+                    FROM fingerprint_video
+                    WHERE id_content = %s and timestamp BETWEEN %s AND %s  
+                """
+
+        data = []
+
+        try:
+            with ConnectionFromPool(self.pool) as conn:
+                with conn.cursor() as cur:
+                    cur.execute(query, (id_content, timestamp_start, timestamp_end, ))
+
+                    rows = cur.fetchall()
+                    if cur.rowcount > 0:
+                        data = rows
+
+        except (Exception, psycopg2.DatabaseError) as error:
+            logger.error(f'Exception: {error}')
+
+        finally:
+            return data
