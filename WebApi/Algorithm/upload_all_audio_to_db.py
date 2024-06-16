@@ -3,12 +3,12 @@ import os
 import sys
 
 from Algorithm.video_create_hash import create_video_fingerprints
-from db_service import DBService
-from db_utilities import load_config
+from Algorithm.db_service import DBService
+from Algorithm.db_utilities import load_config
 from os import listdir
-from audio_create_hashes import create_audio_hashes
-from audio_utility import extract_audio_from_video_source, read_audio
-from default_logger import logger
+from Algorithm.audio_create_hashes import create_audio_hashes
+from Algorithm.audio_utility import extract_audio_from_video_source, read_audio
+from Algorithm.default_logger import logger
 
 
 def get_duration_video(filename: str):

@@ -4,7 +4,7 @@ from skimage.metrics import structural_similarity as ssim
 from moviepy.editor import VideoFileClip
 import statistics
 from time import time
-from default_logger import logger
+from Algorithm.default_logger import logger
 
 
 def resize_and_change_fps(input_path, new_width=144, new_height=176, fps=4):
