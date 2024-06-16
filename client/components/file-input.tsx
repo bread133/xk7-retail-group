@@ -78,11 +78,11 @@ export const FileInput = forwardRef<HTMLInputElement, InputProps>(
         <label
           htmlFor='dropzone-file'
           className={cn(
-            'group relative h-full flex flex-col items-center justify-center w-full aspect-video border-2 border-slate-300 border-dashed rounded-lg dark:border-gray-600 transition',
-            { 'dark:border-slate-400 dark:bg-slate-200': dragActive },
+            'group relative h-full flex flex-col items-center justify-center w-full aspect-video border-2  border-dashed rounded-lg border-gray-600 transition',
+            { 'border-slate-400 bg-slate-200': dragActive },
             { 'h-fit aspect-auto': !noInput },
             { 'items-start justify-start': !noInput },
-            { 'dark:hover:border-gray-500 dark:hover:bg-slate-200': noInput }
+            { 'hover:border-gray-500 hover:bg-slate-200': noInput }
           )}
         >
           <div
@@ -118,13 +118,13 @@ export const FileInput = forwardRef<HTMLInputElement, InputProps>(
                   ></path>
                 </svg>
 
-                <p className='mb-2 text-sm text-gray-500 dark:text-gray-400'>
+                <p className='mb-2 text-sm text-gray-500'>
                   <span className='font-semibold'>
                     Нажмите, чтобы загрузить
                   </span>{' '}
                   или перетащите
                 </p>
-                <p className='text-xs text-gray-500 dark:text-gray-400'>
+                <p className='text-xs text-gray-500'>
                   до {MAX_N_FILES_TO_UPLOAD} видео, до{' '}
                   {(MAX_FILE_SIZE / 1000000000).toFixed(0)} ГБ каждый файл
                 </p>
@@ -146,36 +146,36 @@ export const FileInput = forwardRef<HTMLInputElement, InputProps>(
                 <div className='overflow-x-auto sm:-mx-6 lg:-mx-8'>
                   <div className='align-middle inline-block min-w-full sm:px-6 lg:px-8'>
                     <div className='shadow overflow-hidden sm:rounded-lg'>
-                      <table className='min-w-full divide-y dark:divide-slate-600'>
+                      <table className='min-w-full divide-y divide-slate-600'>
                         <thead className='bg-slate-800'>
                           <tr>
                             <th
                               scope='col'
-                              className='px-6 py-3 text-left text-xs font-medium dark:text-slate-300  uppercase tracking-wider'
+                              className='px-6 py-3 text-left text-xs font-medium text-slate-300  uppercase tracking-wider'
                             >
-                              Preview
+                              Превью
                             </th>
                             <th
                               scope='col'
-                              className='px-6 py-3 text-left text-xs font-medium dark:text-slate-300  uppercase tracking-wider'
+                              className='px-6 py-3 text-left text-xs font-medium text-slate-300  uppercase tracking-wider'
                             >
-                              Name
+                              Название
                             </th>
                             <th
                               scope='col'
-                              className='px-6 py-3 text-left text-xs font-medium dark:text-slate-300  uppercase tracking-wider'
+                              className='px-6 py-3 text-left text-xs font-medium text-slate-300  uppercase tracking-wider'
                             >
-                              Size
+                              Размер
                             </th>
                             <th
                               scope='col'
-                              className='px-6 py-3 text-left text-xs font-medium dark:text-slate-300  uppercase tracking-wider'
+                              className='px-6 py-3 text-left text-xs font-medium text-slate-300  uppercase tracking-wider'
                             >
-                              Status
+                              Статус
                             </th>
                           </tr>
                         </thead>
-                        <tbody className='relative divide-y dark:divide-slate-600'>
+                        <tbody className='relative divide-y divide-slate-600'>
                           {files.map((file: IFile) => {
                             return (
                               <VideoUpload
@@ -193,7 +193,7 @@ export const FileInput = forwardRef<HTMLInputElement, InputProps>(
 
                       <label
                         htmlFor='dropzone-file-images-present'
-                        className='relative cursor-pointer group hover:border-gray-500 dark:hover:bg-slate-200 transition flex justify-center py-4 border-t border-slate-600'
+                        className='relative cursor-pointer group hover:border-gray-500 hover:bg-slate-200 transition flex justify-center py-4 border-t border-slate-600'
                       >
                         <PlusIcon className='flex justify-center  items-center fill-slate-500 stroke-1 group-hover:fill-slate-400 ' />
 

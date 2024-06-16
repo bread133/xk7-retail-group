@@ -1,6 +1,6 @@
 export const Hero = () => {
   return (
-    <div className='relative items-center justify-center w-full overflow-x-hidden lg:pt-40 lg:pb-40 xl:pt-40 xl:pb-64'>
+    <div className=' overflow-y-hidden relative items-center justify-center w-full overflow-x-hidden lg:pt-40 lg:pb-40 xl:pt-40 xl:pb-72'>
       <div className='container flex flex-col items-center justify-between h-full max-w-6xl px-8 mx-auto -mt-32 lg:flex-row xl:px-0'>
         <div className='z-30 flex flex-col items-center w-full max-w-xl pt-48 text-center lg:items-start lg:w-1/2 lg:pt-20 xl:pt-40 lg:text-left'>
           <h1 className='relative mb-4 text-3xl font-black leading-tight text-gray-900 sm:text-6xl xl:mb-8'>
@@ -13,7 +13,7 @@ export const Hero = () => {
             href='#_'
             className='relative self-start inline-block w-auto px-8 py-4 mx-auto mt-0 text-base font-bold text-white bg-indigo-600 hover:bg-indigo-700 transition border-t border-gray-200 rounded-md shadow-xl sm:mt-1 fold-bold lg:mx-0'
           >
-            Проверим!
+            Загрузи видео внизу!
           </a>
 
           <svg

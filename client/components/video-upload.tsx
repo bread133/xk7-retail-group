@@ -23,7 +23,7 @@ export const VideoUpload = forwardRef<HTMLTableRowElement, ImageUploadProps>(
         {...props}
         className={cn('', className)}
       >
-        <td className='px-6 py-4 whitespace-nowrap text-sm dark:text-slate-400'>
+        <td className='px-6 py-4 whitespace-nowrap text-sm text-slate-400'>
           <div className='relative flex h-12 w-20'>
             {error ? (
               <div className='flex w-full justify-center items-center'>
@@ -39,11 +39,11 @@ export const VideoUpload = forwardRef<HTMLTableRowElement, ImageUploadProps>(
             )}
           </div>
         </td>
-        <td className='px-6 py-4 truncate whitespace-normal text-sm font-medium dark:text-slate-400 '>
+        <td className='px-6 py-4 truncate whitespace-normal text-sm font-medium text-slate-400 '>
           <div>
             <p
-              className={cn('dark:text-slate-500', {
-                'dark:text-red-500': error
+              className={cn('text-slate-500', {
+                'text-red-500': error
               })}
             >
               {name}
@@ -51,16 +51,13 @@ export const VideoUpload = forwardRef<HTMLTableRowElement, ImageUploadProps>(
           </div>
         </td>
         <td
-          className={cn(
-            'px-6 py-4 whitespace-nowrap text-sm dark:text-slate-500',
-            {
-              'dark:text-red-500': error
-            }
-          )}
+          className={cn('px-6 py-4 whitespace-nowrap text-sm text-slate-500', {
+            'text-red-500': error
+          })}
         >
           <VideoSize size={size} />
         </td>
-        <td className='px-6 py-4 whitespace-nowrap text-sm dark:text-slate-400 '>
+        <td className='px-6 py-4 whitespace-nowrap text-sm text-slate-400 '>
           <ProgressBar progress={progress} />
         </td>
       </tr>

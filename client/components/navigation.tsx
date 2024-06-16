@@ -16,7 +16,7 @@ export const Navigation = () => {
           pathName === '/' ? 'text-indigo-600' : ''
         }`}
       >
-        Проверка
+        Проверить
       </a>
       <a
         href='/admin'
