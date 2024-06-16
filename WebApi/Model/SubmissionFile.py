@@ -2,7 +2,7 @@ from typing import List
 
 
 class SubmissionFile:
-    id_license: List[int]
+    id_license: int
     id_piracy: List[int]
     time_license_start: List[int]
     time_license_finish: List[int]
