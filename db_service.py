@@ -5,7 +5,6 @@ import psycopg2
 from psycopg2.extras import execute_values
 from psycopg2.extras import LoggingConnection, LoggingCursor
 from psycopg2.extensions import register_adapter, AsIs
-from typing import Tuple
 from default_logger import logger
 
 register_adapter(numpy.int64, AsIs)
@@ -73,8 +72,8 @@ class DBService:
         """
         Creates a service to work with the database. Uses the connection pool.
 
-        :param min_conn: minimum number of connections,
-        :param max_conn: the maximum number of connections,
+        :param min_conn: minimum number of connections.
+        :param max_conn: the maximum number of connections.
         :param config: connection parameters.
         """
         self.pool = psycopg2.pool.SimpleConnectionPool(min_conn, max_conn,
@@ -84,6 +83,8 @@ class DBService:
         """
         Adds a new content with 'title' and 'duration' fields.
 
+        :param title: title content.
+        :param duration: duration content.
         :return: content id from the database.
         """
 
@@ -109,12 +110,11 @@ class DBService:
         finally:
             return id
 
-    def get_content_by_id(self, id: int) -> Tuple[str, int]:
+    def get_content_by_id(self, id: int) -> tuple[str, int]:
         """
         Getting content data by id content.
 
-        :param: id content.
-
+        :param: id: id content.
         :return: content data (title and duration in seconds).
         """
 
@@ -147,9 +147,8 @@ class DBService:
         Note: does not remove data with the specified id from child tables.
             To do so, use the 'cascadeDeleteContentById' method.
 
-        :param: id content.
-
-        :return: Boolean value that tells whether the content was deleted.
+        :param: id: id content.
+        :return: boolean value that tells whether the content was deleted.
         """
 
         query = """ DELETE FROM content WHERE id = %s; """
@@ -175,9 +174,8 @@ class DBService:
 
         Note: will delete data from child tables where id_context = id.
 
-        :param: id content
-
-        :return: Boolean value that tells whether the content was deleted.
+        :param: id: id content.
+        :return: boolean value that tells whether the content was deleted.
         """
 
         query = """ DELETE FROM snapshot_audio WHERE id_content = %s;
@@ -204,11 +202,10 @@ class DBService:
         """
         Adds a new audio snapshot with 'id_content', 'timestamp' and 'hash' fields.
 
-        :param id_content: id content
-        :param timestamp: snapshot time
-        :param hash: snapshot hash
-
-        :return: Audio snapshot id from the database.
+        :param id_content: id content.
+        :param timestamp: snapshot time.
+        :param hash: snapshot hash.
+        :return: audio snapshot id from the database.
         """
 
         query = """ INSERT INTO snapshot_audio(id_content, timestamp, hash)
@@ -233,12 +230,11 @@ class DBService:
         finally:
             return id
 
-    def add_audio_snapshots(self, data: list[Tuple[int, int, str]]):
+    def add_audio_snapshots(self, data: list[tuple[int, int, str]]):
         """
         Adds a list of audio snapshot data.
 
-        :param data: list with tuple elements - 'id_content', 'timestamp' and 'hash'.
-
+        :param data: list with tuple ('id_content', 'timestamp' and 'hash').
         :return: two values: id of the first inserted line and the number of inserted elements.
         """
 
@@ -251,10 +247,7 @@ class DBService:
         try:
             with ConnectionFromPool(self.pool) as conn:
                 with conn.cursor() as cur:
-                    execute_values(cur, query, data)
-                    # rows = cur.fetchone()
-                    # if rows:
-                    #     result = rows[0], cur.rowcount
+                    execute_values(cur, query, data, page_size=10000)
 
         except (Exception, psycopg2.DatabaseError) as error:
             logger.error(f'Exception: {error}')
@@ -262,12 +255,11 @@ class DBService:
         finally:
             return result
 
-    def get_audio_snapshots_by_hash(self, hash) -> list[Tuple[int, int]]:
+    def get_audio_snapshots_by_hash(self, hash) -> list[tuple[int, int]]:
         """
         Searches all audio snapshots for the given 'hash' value.
 
         :param hash: snapshot hash.
-
         :return: list of found rows with 'id_content' and 'timestamp'.
         """
 
@@ -275,6 +267,7 @@ class DBService:
                     FROM snapshot_audio
                     WHERE hash = %s;
                 """
+
         data = []
 
         try:
@@ -292,19 +285,17 @@ class DBService:
         finally:
             return data
 
-    def get_audio_snapshots_by_hashes(self, hashes: list[str]) -> list[Tuple[int, int, str]]:
+    def get_audio_snapshots_by_hashes(self, hashes: list[str]) -> list[tuple[int, int, str]]:
         """
-        Performs a hash search and returns matches from the database
+        Performs a hash search and returns matches from the database.
 
-        :param hashes: - list of snapshot hash
-
-        :return: list of hashes from elements (‘id_content’, ‘timestamp’, ‘hash’)
+        :param hashes: list of snapshot hash.
+        :return: list of hashes from elements (‘id_content’, ‘timestamp’, ‘hash’).
         """
 
         query = """ SELECT id_content, timestamp, hash
                     FROM snapshot_audio
                     WHERE hash IN %s
-                    
                 """
 
         data = []
