@@ -13,16 +13,15 @@ def extract_audio_from_video_source(input_source) -> BytesIO:
     :param video_stream: Поток байтов с видеоданными.
     :return audio_stream: Поток байтов с аудиоданными в формате wav.
     """
-    video_clip = VideoFileClip(input_source)
-    audio_clip = video_clip.audio
-    audio_samples = audio_clip.to_soundarray()
-    sample_rate = audio_clip.fps  # Получение исходного sample rate
+    out, _ = (
+        ffmpeg
+        .input(input_source)
+        .output('pipe:', format='wav')
+        .run(capture_stdout=True, capture_stderr=True)
+    )
 
-    # Создаем поток для wav-данных
-    wav_io = BytesIO()
-    wavfile.write(wav_io, sample_rate, audio_samples.astype(np.int16))
-    wav_io.seek(0)
-    return wav_io
+    # Создаем байтовый поток из данных
+    return BytesIO(out)
 
 
 def read_audio(input_source) -> tuple[np.ndarray, int]:
