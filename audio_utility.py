@@ -1,8 +1,6 @@
 import numpy as np
 import ffmpeg
 from io import BytesIO
-from moviepy.video.io.VideoFileClip import VideoFileClip
-from requests import get
 from scipy.io import wavfile
 
 
