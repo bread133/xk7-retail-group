@@ -8,10 +8,13 @@ from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
 from uuid import UUID
 
+from Algorithm.db_service import DBService
+from Algorithm.db_utilities import load_config
 from Common.FaultException import Fault
-from Common.FileValidation import FileValidation, video_validation
+from Common.FileValidation import video_validation
 from Model.OperationInfo import *
 from Model.UploadVideo import UploadVideo
+from Algorithm.upload_all_audio_to_db import create_fingerprint_audio, create_and_load_fingerprint_audio
 
 app = FastAPI()
 
@@ -28,10 +31,10 @@ app.add_middleware(
 )
 
 @app.get('/download-submission-file')
-async def get_submission_file(id_video: UUID):
+async def get_submission_file(id_content: UUID):
     # достать из бд и показать в submission-файле с расширением - csv
     try:
-        pass
+        operation_info = OperationInfo(OperationType.GetSubFile, OperationStatus.InProcess)
     except:
         pass
     finally:
@@ -60,7 +63,8 @@ async def upload_video_to_create_fingerprint(file: List[UploadFile] = File(...))
             result_value: UploadVideo = video_validation_result.upload_video
             result_of_loading_to_server = await result_value.load_video_to_server(_file)
         operation_info = OperationInfo(OperationType.LoadVideoToSubFile, OperationStatus.InProcess)
-        # TODO: create fingerprint into video
+        # create fingerprint into video
+        fingerprint = create_fingerprint_audio(result_value.path)
         # TODO: sopostavlenie sdelayte sami
         # TODO: add to db and return uploadVideo in json
         operation_info.change_status(OperationStatus.Done)
@@ -73,6 +77,7 @@ async def upload_video_to_create_fingerprint(file: List[UploadFile] = File(...))
         return JSONResponse(operation_info.to_json(result_value))
 
 
+# ready
 @app.post('/api/filesOriginal')
 async def upload_video_to_database(file: List[UploadFile] = File(...)):
     try:
@@ -82,10 +87,10 @@ async def upload_video_to_database(file: List[UploadFile] = File(...)):
         for _file in file:
             video_validation_result = video_validation(_file)
             result_value: UploadVideo = video_validation_result.upload_video
-            result_of_loading_to_server = await result_value.load_video_to_server(_file)
+            await result_value.load_video_to_server(_file)
         operation_info = OperationInfo(OperationType.LoadVideoToDatabase, OperationStatus.InProcess)
-        # TODO: create fingerprint into video
-        # TODO: add to db and return uploadVideo in json
+        # create fingerprint into video and add to db
+        fingerprint = create_fingerprint_audio(result_value.path)
         operation_info.change_status(OperationStatus.Done)
     except ValidationError as e:
         operation_info.set_fault(Fault(400, e.json(result_value)))
@@ -97,4 +102,6 @@ async def upload_video_to_database(file: List[UploadFile] = File(...)):
 
 
 if __name__ == '__main__':
+    config = load_config()
+    db_service = DBService(1, 5, config)
     uvicorn.run('app:app', host='127.0.0.1', port=8001)

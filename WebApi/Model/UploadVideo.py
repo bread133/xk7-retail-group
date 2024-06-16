@@ -15,8 +15,7 @@ class UploadVideo(BaseOperation):
     def __init__(self, title: str, extension: str):
         self.title = title
         self.extension = extension
-        self.filename_hex = secrets.token_hex(16)
-        self.path = f"{os.getcwd()}\\WebApi\\VideoContainer\\{self.filename_hex}{extension}"
+        self.path = f"{os.getcwd()}\\WebApi\\VideoContainer\\{self.title}{extension}"
         self.result_of_loading = None
 
         _id = uuid.uuid4()
