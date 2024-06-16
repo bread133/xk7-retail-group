@@ -1,15 +1,21 @@
 from typing import List
+from pydantic import BaseModel
 
 
-class ResultFile:
+class IVideoBorrowing(BaseModel):
     title_license: str
-    title_piracy: List[str]
-    time_license_start: List[int]
-    time_license_finish: List[int]
-    time_piracy_start: List[int]
-    time_piracy_finish: List[int]
-
-    def __init__(self):
-        pass
+    title_piracy: str
+    time_license_start: int
+    time_license_finish: int
+    time_piracy_start: int
+    time_piracy_finish: int
 
 
+class IResponseServerUploadFiles(BaseModel):
+    message: str
+    status: int
+    borrowing: List[IVideoBorrowing]
+
+
+def to_json(upload_files_response: IResponseServerUploadFiles):
+    upload_files_response.json()

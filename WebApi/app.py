@@ -30,27 +30,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-@app.get('/download-submission-file')
-async def get_submission_file(id_content: UUID):
-    # достать из бд и показать в submission-файле с расширением - csv
-    try:
-        operation_info = OperationInfo(OperationType.GetSubFile, OperationStatus.InProcess)
-    except:
-        pass
-    finally:
-        pass
-
-
-@app.get('/show-fingerprint')
-async def get_borrow_table(id_video: UUID):
-    # достать из бд и показать в json-табличке
-    try:
-        pass
-    except:
-        pass
-    finally:
-        pass
-
 
 @app.post('/api/files')
 async def upload_video_to_create_fingerprint(file: List[UploadFile] = File(...)):
@@ -74,6 +53,8 @@ async def upload_video_to_create_fingerprint(file: List[UploadFile] = File(...))
         # delete video after fingerprint creation
         if os.path.exists(video_validation_result.upload_video.path):
             os.remove(video_validation_result.upload_video.path)
+
+
         return JSONResponse(operation_info.to_json(result_value))
 
 
