@@ -65,21 +65,25 @@ async def upload_video_to_create_fingerprint(file: List[UploadFile] = File(...))
 
 @app.post('/api/filesOriginal')
 async def upload_video_to_database(file: List[UploadFile] = File(...)):
-    if file is None:
-        raise Fault.validation_fault('load file is empty')
-    # validation
-    for _file in file:
-        video_validation_result = video_validation(_file)
-        result_value = await video_validation_result.upload_video.load_video_to_server(_file)
-    operation_info = OperationInfo(OperationType.LoadVideoToDatabase, OperationStatus.InProcess)
-    # TODO: create fingerprint into video
-    # TODO: sopostavlenie
-    # TODO: add to db and return uploadVideo in json
-    operation_info.change_status(OperationStatus.Done)
-    # delete video after fingerprint creation
-    if os.path.exists(video_validation_result.upload_video.path):
-        os.remove(video_validation_result.upload_video.path)
-    return JSONResponse(operation_info.to_json())
+    try:
+        if file is None:
+            raise Fault.bad_request_fault('load file is empty')
+        # validation
+        for _file in file:
+            video_validation_result = video_validation(_file)
+            result_value: UploadVideo = video_validation_result.upload_video
+            result_of_loading_to_server = await result_value.load_video_to_server(_file)
+        operation_info = OperationInfo(OperationType.LoadVideoToDatabase, OperationStatus.InProcess)
+        # TODO: create fingerprint into video
+        # TODO: add to db and return uploadVideo in json
+        operation_info.change_status(OperationStatus.Done)
+    except ValidationError as e:
+        operation_info.set_fault(Fault(400, e.json(result_value)))
+    finally:
+        # delete video after fingerprint creation
+        if os.path.exists(video_validation_result.upload_video.path):
+            os.remove(video_validation_result.upload_video.path)
+        return JSONResponse(operation_info.to_json(result_value))
 
 
 if __name__ == '__main__':
