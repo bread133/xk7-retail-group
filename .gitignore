@@ -13,3 +13,4 @@ WebApi/Model/__pycache__/
 venv/
 WebApi/.idea/
 testt.py
+/venv/
