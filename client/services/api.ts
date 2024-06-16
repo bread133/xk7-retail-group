@@ -40,6 +40,13 @@ export const uploadFile = async ({
       }
     )
 
+    // тот самый костыль, если все будет без багов, просто убери комменты Маша
+    // if (response.status === 200) {
+    //   setProgress(fileId, 100)
+    // }
+
+    console.log('ЭТО ТО ЧТО МНЕ НУЖНО !!! РОДЯ: ', response)
+
     return response.data
   } catch (error) {
     console.log('ERROR', error)

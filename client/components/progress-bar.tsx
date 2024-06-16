@@ -10,7 +10,7 @@ export const ProgressBar = ({ className, progress }: ProgressBarProps) => {
   return (
     <div
       className={cn(
-        'max-w-[130px] bg-gray-200 rounded-full h-2.5 dark:bg-gray-700',
+        'max-w-[130px] bg-gray-200 rounded-full h-2.5 bg-gray-700',
         className
       )}
     >

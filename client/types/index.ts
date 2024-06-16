@@ -11,11 +11,12 @@ export interface IFile {
 }
 
 export interface IVideoBorrowing {
-  originalLink: string
-  id: string
-  start: string
-  end: string
-  nameVideo: string
+  title_license: string
+  title_piracy: string
+  time_license_start: number
+  time_license_finish: number
+  time_piracy_start: number
+  time_piracy_finish: number
 }
 
 export interface IResponseServerUploadFiles {

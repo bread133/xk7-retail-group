@@ -18,52 +18,59 @@ export const BorrowingTable = () => {
           <div className='overflow-x-auto'>
             <div className='align-middle inline-block min-w-full sm:px-6 lg:px-'>
               <div className='shadow overflow-hidden sm:rounded-lg'>
-                <table className='min-w-full divide-y dark:divide-slate-600'>
+                <table className='min-w-full divide-y divide-slate-600'>
                   <thead className='bg-slate-800'>
                     <tr>
                       <th
                         scope='col'
-                        className='px-6 py-3 text-left text-xs font-medium dark:text-slate-400  uppercase tracking-wider'
+                        className='px-6 py-3 text-left text-xs font-medium text-slate-400  uppercase tracking-wider'
                       >
-                        Название
+                        Название оригинала
                       </th>
                       <th
                         scope='col'
-                        className='px-6 py-3 text-left text-xs font-medium dark:text-slate-400  uppercase tracking-wider'
+                        className='px-6 py-3 text-left text-xs font-medium text-slate-400  uppercase tracking-wider'
                       >
-                        ID
+                        Название заимствования
                       </th>
                       <th
                         scope='col'
-                        className='px-6 py-3 text-left text-xs font-medium dark:text-slate-400  uppercase tracking-wider'
+                        className='px-6 py-3 text-left text-xs font-medium text-slate-400  uppercase tracking-wider'
                       >
-                        Оригинал
+                        Начало оригинала
                       </th>
                       <th
                         scope='col'
-                        className='px-6 py-3 text-left text-xs font-medium dark:text-slate-400  uppercase tracking-wider'
+                        className='px-6 py-3 text-left text-xs font-medium text-slate-400  uppercase tracking-wider'
                       >
-                        Начало
+                        Конец оригинала
                       </th>
                       <th
                         scope='col'
-                        className='px-6 py-3 text-left text-xs font-medium dark:text-slate-400  uppercase tracking-wider'
+                        className='px-6 py-3 text-left text-xs font-medium text-slate-400  uppercase tracking-wider'
                       >
-                        Конец
+                        Начало заимствования
+                      </th>
+                      <th
+                        scope='col'
+                        className='px-6 py-3 text-left text-xs font-medium text-slate-400  uppercase tracking-wider'
+                      >
+                        Конец заимствования
                       </th>
                     </tr>
                   </thead>
-                  <tbody className='relative divide-y dark:divide-slate-600'>
+                  <tbody className='relative divide-y divide-slate-600'>
                     {videoBorrowings.map(
                       (item: IVideoBorrowing, index: number) => {
                         return (
                           <BorrowingItem
-                            key={`${item.id}${index}`}
-                            end={item.end}
-                            id={item.id}
-                            nameVideo={item.nameVideo}
-                            originalLink={item.originalLink}
-                            start={item.start}
+                            time_license_finish={item.time_license_finish}
+                            time_license_start={item.time_license_start}
+                            time_piracy_finish={item.time_piracy_finish}
+                            time_piracy_start={item.time_piracy_start}
+                            title_license={item.title_license}
+                            title_piracy={item.title_piracy}
+                            key={`${item.title_piracy}${item.title_license}${index}`} // если что это просто уникальный ключ для оптимизации рендера для каждой строки (инфа для бэкендеров)
                           />
                         )
                       }
