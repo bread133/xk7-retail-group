@@ -19,9 +19,9 @@ class FileValidation:
 acceptable_extension: list = ['.mp4']
 
 
-def video_validation(file: UploadFile):
-    validation_result = (file.content_type != 'multipart/form-data')
-    if not validation_result:
+def video_validation(file: UploadFile) -> FileValidation:
+    validation_result = (file.content_type != 'video/mp4')
+    if validation_result:
         raise Fault.validation_fault("content type of upload file is incorrect")
 
     filename = file.filename

@@ -14,6 +14,9 @@ class Fault(Exception):
         self.code = code
         self.message = message
 
+    def __str__(self):
+        return f"Fault(code = {self.code}, message = {self.message})"
+
     @staticmethod
     def validation_fault(message: str):
         return Fault(HttpStatusErrorCode.BadRequest, message)
