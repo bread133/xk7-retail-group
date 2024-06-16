@@ -80,9 +80,11 @@ def example_audio_match_search():
 
         db_service = DBService(1, 1, config)
 
-        name = 'ded3d179001b3f679a0101be95405d2c'
+        name = 'audio/ded3d179001b3f679a0101be95405d2c'
 
+        start_time = time()
         dict_audio_matches = audio_match_search(db_service, name + '.wav')
+        print(f'search matches time: {time() - start_time} seconds')
 
         for id_content, values in dict_audio_matches.items():
             logger.info(f'audio {id_content}:')
