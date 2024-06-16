@@ -8,6 +8,7 @@ import pytz
 import json
 
 from Common.FaultException import Fault
+from Model.BaseOperation import BaseOperation
 
 
 class OperationType(Enum):
@@ -33,8 +34,9 @@ class OperationInfo:
     change_at: datetime
     success: bool
     fault: Fault
+    content: BaseOperation
 
-    def __init__(self, op_type = OperationType.Unknown, status = OperationStatus.Unknown):
+    def __init__(self, op_type=OperationType.Unknown, status=OperationStatus.Unknown):
         self.id = uuid.uuid4()
         self.create_at = get_msk_time()
         self.op_type = op_type
@@ -57,22 +59,20 @@ class OperationInfo:
         self.status = OperationStatus.Die
         self.change_at = get_msk_time()
 
-    def to_json(self):
+    def to_json(self, content):
         operation_info_to_serialize = OperationInfoToSerialize(
             id=str(self.id), create_at=str(self.create_at),
             op_type=str(self.op_type), status=str(self.status),
             change_at=str(self.change_at), success=str(self.success),
-            fault=str(self.fault), content=str(0)
+            fault=str(self.fault), content=str(content)
         )
         return operation_info_to_serialize.json()
-
-
 
     def __str__(self):
         return (
             f"id = {self.id}, create_at = {self.create_at}, "
             f"op_type = {self.op_type}, status = {self.status}, "
-            f"change_at = {self.change_at}, success = {self.success}")
+            f"change_at = {self.change_at}, success = {self.success}, content={self.content}")
 
 
 class OperationInfoToSerialize(BaseModel):

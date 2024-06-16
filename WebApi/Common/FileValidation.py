@@ -22,7 +22,7 @@ acceptable_extension: list = ['.mp4']
 def video_validation(file: UploadFile) -> FileValidation:
     validation_result = (file.content_type != 'video/mp4')
     if validation_result:
-        raise Fault.validation_fault("content type of upload file is incorrect")
+        raise Fault.bad_request_fault("content type of upload file is incorrect")
 
     filename = file.filename
     index = filename.index('.')
@@ -31,4 +31,5 @@ def video_validation(file: UploadFile) -> FileValidation:
     if extension not in acceptable_extension:
         raise Fault.validation_fault(f'{extension} extension of file is incorrect')
     upload_video = UploadVideo(title, extension)
+
     return FileValidation(file, upload_video)

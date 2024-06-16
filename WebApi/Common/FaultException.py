@@ -1,7 +1,9 @@
 import string
+from fastapi import HTTPException
+
 from Common.HttpStatusCodes import HttpStatusErrorCode
 
-class Fault(Exception):
+class Fault(HTTPException):
     code: int
     message: string
 
@@ -10,13 +12,14 @@ class Fault(Exception):
         self.message = 'Unknown message has throw'
         super.__init__(self.message)
 
-    def __init__(self, code, message):
+    def __init__(self, code: int, message: str):
         self.code = code
         self.message = message
+        super.__init__(self.message)
 
     def __str__(self):
-        return f"Fault(code = {self.code}, message = {self.message})"
+        return f"Fault(code={self.code}, message={self.message})"
 
     @staticmethod
-    def validation_fault(message: str):
+    def bad_request_fault(message: str):
         return Fault(HttpStatusErrorCode.BadRequest, message)
