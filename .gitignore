@@ -10,8 +10,9 @@ database.ini
 WebApi/__pycache__/
 WebApi/Common/__pycache__/
 WebApi/Model/__pycache__/
-venv/
+venvvvvv/
 WebApi/.idea/
 testt.py
 /venv
 /venv/
+.venv/

@@ -5,8 +5,9 @@ pydantic==2.7.4
 numpy==1.26.4
 scipy==1.13.1
 scikit-learn==1.5.0
-ffmpeg==1.4
+ffmpeg-python==0.2.0
 psycopg2==2.9.9
 opencv-python==4.10.0.82
 moviepy==1.0.3
 scikit-image==0.23.2
+varname~=0.13.1
