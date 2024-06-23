@@ -1,7 +1,7 @@
 from collections import defaultdict
 from bisect import bisect_left
-from db_service import DBService
-from default_logger import logger
+from Algorithm.db_service import DBService
+from Algorithm.default_logger import logger
 
 
 def merge_sequence(duration_list: list[tuple[int, int, int]], value: tuple[int, int, int], idx_start: int, idx_end: int):

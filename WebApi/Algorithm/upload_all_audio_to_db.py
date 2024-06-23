@@ -10,6 +10,8 @@ from Algorithm.audio_create_hashes import create_audio_hashes
 from Algorithm.audio_utility import extract_audio_from_video_source, read_audio
 from Algorithm.default_logger import logger
 
+from Algorithm.main_audio import audio_match_search
+
 
 def get_duration_video(filename: str):
     cap = cv2.VideoCapture(filename)
@@ -27,13 +29,23 @@ def get_duration_video(filename: str):
 
 
 def create_fingerprint_audio(path: str):
+    print("start algorithm")
     audio_stream_ = extract_audio_from_video_source(path)
+    print("audio_stream_ is success")
     audio_samples_, sample_rate_ = read_audio(audio_stream_)
+    print("sample_rate_ is success")
 
     result_hashes_ = create_audio_hashes(audio_samples_, sample_rate_)
+    print("result_hashes_ is success")
 
     return result_hashes_
 
+def match_audio_fingerprint(path: str, db_service_):
+    audio_source = extract_audio_from_video_source(path)
+
+    dict_audio_matches = audio_match_search(db_service_, audio_source)
+
+    return dict_audio_matches
 
 def create_and_load_fingerprint_audio(title: str, path: str, db_service_):
     id_ = db_service_.add_content(title, get_duration_video(path))

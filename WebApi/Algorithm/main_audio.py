@@ -1,13 +1,15 @@
 from collections import defaultdict
-from datetime import time
+from time import time
+import sys
 
-from default_logger import logger
-from db_service import DBService
-from db_utilities import load_config
-from audio_utility import get_audio_duration
-from audio_utility import read_audio
-from audio_detection import detect_audio
-from audio_create_hashes import create_audio_hashes
+from Algorithm.default_logger import logger
+from Algorithm.db_service import DBService
+from Algorithm.db_utilities import load_config
+from Algorithm.audio_utility import get_audio_duration
+from Algorithm.audio_utility import read_audio
+from Algorithm.audio_detection import detect_audio
+from Algorithm.audio_create_hashes import create_audio_hashes
+from Algorithm.audio_utility import extract_audio_from_video_source
 
 
 def add_audio_to_db(db_service_: DBService, audio_source_, id_content_: int) -> list[tuple[str, int]]:
@@ -72,7 +74,7 @@ def audio_match_search(db_service_: DBService, audio_source_) -> dict[list[tuple
         return audio_dict
 
 
-def example_audio_match_search():
+def example_audio_match_search(path: str):
     """
     Example of an audio record match search
     """
@@ -82,10 +84,12 @@ def example_audio_match_search():
 
         db_service = DBService(1, 1, config)
 
-        name = 'audio/ded3d179001b3f679a0101be95405d2c'
+        start_time = time()
+        audio_source = extract_audio_from_video_source(path)
+        print(f'extract audio from video: {time() - start_time} seconds')
 
         start_time = time()
-        dict_audio_matches = audio_match_search(db_service, name + '.wav')
+        dict_audio_matches = audio_match_search(db_service, audio_source)
         print(f'search matches time: {time() - start_time} seconds')
 
         for id_content, values in dict_audio_matches.items():
@@ -99,4 +103,7 @@ def example_audio_match_search():
 
 
 if __name__ == '__main__':
-    example_audio_match_search()
+    if len(sys.argv) != 2:
+        logger.error(f'error')
+
+    example_audio_match_search(sys.argv[1])
