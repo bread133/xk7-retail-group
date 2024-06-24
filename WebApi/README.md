@@ -10,9 +10,11 @@
 3. Установить необходимые зависимости:
 
    `pip install -r requirements.txt`.
-4. Перейти в папку WebApi
+4. Добавить файл database.ini
+
+5. Перейти в папку WebApi
 
    `cd WebApi/`.
-5. Запустить сервер:
+6. Запустить сервер:
    
    `uvicorn app:app --reload`.

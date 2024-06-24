@@ -65,7 +65,8 @@ def audio_match_search(db_service_: DBService, audio_source_) -> dict[list[tuple
         logger.info(f'created {len(result_hashes)} hashes')
 
         audio_dict = detect_audio(result_hashes, db_service_)
-        logger.info(f'count find: {len(audio_dict)}\naudio id finds: {list(audio_dict.keys())}')
+        logger.info(f'count find: {len(audio_dict)}')
+                                                    # audio id finds: {list(audio_dict.keys())}
 
     except Exception as ex_:
         logger.error(ex_)

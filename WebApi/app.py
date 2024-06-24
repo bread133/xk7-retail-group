@@ -11,10 +11,13 @@ from Algorithm.db_service import DBService
 from Algorithm.db_utilities import load_config
 from Common.FaultException import Fault
 from Common.FileValidation import video_validation
+from Common.HttpStatusCodes import HttpStatusSuccessfulCode
 from Model.OperationInfo import *
 from Model.UploadVideo import UploadVideo
 from Algorithm.upload_all_audio_to_db import create_fingerprint_audio, create_and_load_fingerprint_audio, \
     match_audio_fingerprint
+from Algorithm.db_service import DBService
+from Model.ResultTable import IResponseServerUploadFiles, IVideoBorrowing
 
 # TODO: solve import with Algorithm import
 
@@ -51,18 +54,40 @@ async def upload_video_to_create_fingerprint(file: List[UploadFile] = File(...))
         # create list of dictionary
         result_audio_matching = match_audio_fingerprint(result_value.path, db_service)
 
+        video_borrowing_dictionary: List[IVideoBorrowing] = []
+        for result_audio_matching_item in result_audio_matching:
+            id_piracy = int(result_audio_matching_item)
+            title_piracy = DBService.get_content_by_id(db_service, id_piracy)[0]
+            for result_audio_matching_tuple in result_audio_matching[result_audio_matching_item]:
+                time_license_start = result_audio_matching_tuple[0]
+                time_license_finish = result_audio_matching_tuple[1]
+                diff = result_audio_matching_tuple[2]
+                video_borrowing_dictionary.append(IVideoBorrowing(title_license=title_piracy, title_piracy=result_value.title + result_value.extension, time_license_start=time_license_start, time_license_finish=time_license_finish, time_piracy_start=time_license_start + diff, time_piracy_finish=time_license_finish + diff))
+
+        json = IResponseServerUploadFiles(message="matching is successful", status=HttpStatusSuccessfulCode.Ok, borrowing=video_borrowing_dictionary).model_json_schema()
         operation_info.change_status(OperationStatus.Done)
+
+        if os.path.exists(video_validation_result.upload_video.path):
+            os.remove(video_validation_result.upload_video.path)
+
+        dump_json = json.dumps(json, indent=2)
+        return JSONResponse(dump_json)
+
     except ValidationError as e:
         operation_info.set_fault(Fault(400, e.json(result_value)))
-    except Exception as e:
-        operation_info.set_fault(Fault(400, e.json(result_value)))
-    finally:
         # delete video after fingerprint creation
         if os.path.exists(video_validation_result.upload_video.path):
             os.remove(video_validation_result.upload_video.path)
 
+        return JSONResponse(operation_info.to_json(result_value))
+    except Exception as e:
+        operation_info.set_fault(Fault(400, e.json(result_value)))
+        # delete video after fingerprint creation
+        if os.path.exists(video_validation_result.upload_video.path):
+            os.remove(video_validation_result.upload_video.path)
 
         return JSONResponse(operation_info.to_json(result_value))
+
 
 
 # ready

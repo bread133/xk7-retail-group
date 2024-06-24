@@ -6,3 +6,6 @@ class HttpStatusErrorCode:
     RequestTimeout = 408
     Conflict = 409
     InternalServerError = 500
+
+class HttpStatusSuccessfulCode:
+    Ok = 200

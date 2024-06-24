@@ -1,8 +1,10 @@
 from typing import List
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 from varname import nameof
 
 class IVideoBorrowing(BaseModel):
+    model_config = ConfigDict(extra='allow')
+
     title_license: str
     title_piracy: str
     time_license_start: int
@@ -19,10 +21,12 @@ class IVideoBorrowing(BaseModel):
                 f"{nameof(self.title_piracy_finish)}: {self.title_piracy_finish},\n")
 
     def to_json(self):
-        self.to_json()
+        self.json()
+
 
 
 class IResponseServerUploadFiles(BaseModel):
+    model_config = ConfigDict(extra='allow')
     message: str
     status: int
     borrowing: List[IVideoBorrowing]
@@ -30,12 +34,7 @@ class IResponseServerUploadFiles(BaseModel):
     def __str__(self):
         return (f"{nameof(self.message)}: {self.message},\n"
                 f"{nameof(self.status)}: {self.status},\n"
-                f"{nameof(self.borrowing)}: {self.borrowing}")
+                f"{nameof(self.borrowing)}: {str(self.borrowing)}")
 
     def to_json(self):
-        self.to_json()
-
-
-
-def to_json(upload_files_response: IResponseServerUploadFiles):
-    upload_files_response.json()
+        self.model_dump_json()
