@@ -6,8 +6,12 @@ from db_service import DBService
 from db_utilities import load_config
 from audio_utility import get_audio_duration
 from audio_utility import read_audio
+from audio_utility import extract_audio_from_video_source
 from audio_detection import detect_audio
 from audio_create_hashes import create_audio_hashes
+from time import time
+import sys
+import traceback 
 
 
 def add_audio_to_db(db_service_: DBService, audio_source_, id_content_: int) -> list[tuple[str, int]]:
@@ -42,7 +46,7 @@ def add_audio_to_db(db_service_: DBService, audio_source_, id_content_: int) -> 
         return result_hashes
 
 
-def audio_match_search(db_service_: DBService, audio_source_) -> dict[list[tuple[int, int, int]]]:
+def audio_match_search(db_service_: DBService, audio_source_) -> dict[int, list[tuple[int, int, int]]]:
     """
 
     :param db_service_: Database access object
@@ -62,41 +66,46 @@ def audio_match_search(db_service_: DBService, audio_source_) -> dict[list[tuple
         result_hashes = create_audio_hashes(audio_samples_, sample_rate_)
         logger.info(f'created {len(result_hashes)} hashes')
 
-        audio_dict = detect_audio(result_hashes, db_service_)
+        audio_dict = detect_audio(result_hashes, duration, db_service_, max_diff_s=2)
         logger.info(f'count find: {len(audio_dict)}\naudio id finds: {list(audio_dict.keys())}')
 
     except Exception as ex_:
         logger.error(ex_)
+        traceback.print_exc() 
 
     finally:
         return audio_dict
 
 
-def example_audio_match_search():
+def example_audio_match_search(path: str):
     """
     Example of an audio record match search
     """
 
     try:
         config = load_config()
-
+        
         db_service = DBService(1, 1, config)
-
-        name = 'audio/ded3d179001b3f679a0101be95405d2c'
-
+        
         start_time = time()
-        dict_audio_matches = audio_match_search(db_service, name + '.wav')
+        audio_source = extract_audio_from_video_source(path)
+        print(f'extract audio from video: {time() - start_time} seconds')
+        
+        start_time = time()
+        dict_audio_matches = audio_match_search(db_service, audio_source)
         print(f'search matches time: {time() - start_time} seconds')
-
+        
         for id_content, values in dict_audio_matches.items():
             logger.info(f'audio {id_content}:')
             for time_start, time_end, diff in values:
-                if time_end - time_start >= 10:
-                    logger.info(f'match {time_start} to {time_end} ({time_start + diff} to {time_end + diff} ) seconds')
+                logger.info(f'match {time_start} to {time_end} ({time_start + diff} to {time_end + diff} ) seconds')
 
     except Exception as ex:
         logger.error(ex)
 
 
 if __name__ == '__main__':
-    example_audio_match_search()
+    if len(sys.argv) != 2:
+        logger.error(f'error')
+    
+    example_audio_match_search(sys.argv[1])
