@@ -5,6 +5,7 @@ from default_logger import logger
 
 
 def merge_sequence(duration_list: list[tuple[int, int, int]], value: tuple[int, int, int], idx_start: int, idx_end: int):
+    
     left_value = min(duration_list[idx_start][0], value[0])
     right_value = max(duration_list[idx_end - 1][1], value[1])
 
@@ -25,7 +26,7 @@ def add_duration(duration_list: list[tuple[int, int, int]], value: tuple[int, in
         return
 
     idx_start = bisect_left(duration_list, value[0], key=lambda item: item[0])
-    idx_end = bisect_left(duration_list, value[1], key=lambda item: item[1])
+    idx_end = bisect_left(duration_list, value[1], lo=idx_start, key=lambda item: item[1])
 
     if idx_start > 0 and value[0] - duration_list[idx_start - 1][1] <= max_distance:
         idx_start -= 1
@@ -44,8 +45,8 @@ def add_duration(duration_list: list[tuple[int, int, int]], value: tuple[int, in
         merge_sequence(duration_list, duration_list[idx_start], idx_start, idx_start + 2)
 
 
-def find_durations(dict_audio: dict[list[tuple[int, int]]], max_duration_s=1, min_duration_s=10)\
-        -> dict[list[tuple[int, int, int]]]:
+def find_durations(dict_audio: dict[list[tuple[int, int]]], max_diff_s=1, min_duration_s=10)\
+        -> dict[int, list[tuple[int, int, int]]]:
 
     result_dict = defaultdict(list[tuple[int, int, int]])
 
@@ -66,23 +67,29 @@ def find_durations(dict_audio: dict[list[tuple[int, int]]], max_duration_s=1, mi
                 continue
 
             logger.debug(f'count: {len(times)}\n{diff_local}: {times}')
-
+            
+            count = 0
             i = 0
             while i < len(times):
                 j = i
                 while j < len(times) - 1:
-                    if times[j + 1] // 1000 - times[j] // 1000 > max_duration_s:
+                    if (times[j + 1] - times[j]) // 1000 > max_diff_s:
                         break
                     j += 1
-                if j - i >= 2:
-                    add_duration(duration_list_local, (times[i] // 1000, times[j] // 1000, int(diff_local)),
-                                 max_duration_s)
+                if j - i > 2:
+                    new_diff_local = int(diff_local)
+                    if times[i] // 1000 + int(diff_local) < 0:
+                        new_diff_local += 1
+                    
+                    add_duration(duration_list_local, (times[i] // 1000, times[j] // 1000, new_diff_local),
+                                 max_diff_s)
+                    count += j - i
 
                 i = j + 1
 
             for tuple_value in duration_list_local:
                 if tuple_value[1] - tuple_value[0] >= min_duration_s:
-                    duration_list.append(tuple_value)
+                    add_duration(duration_list, tuple_value, 5)
 
         if duration_list:
             result_dict[str(id_content)] = duration_list
@@ -90,7 +97,7 @@ def find_durations(dict_audio: dict[list[tuple[int, int]]], max_duration_s=1, mi
     return result_dict
 
 
-def detect_audio(hashes_: list[tuple[str, int]], db_service_: DBService) -> dict[list[tuple[int, int, int]]]:
+def detect_audio(hashes_: list[tuple[str, int]], duration_audio, db_service_: DBService, max_diff_s=3, min_duration_s=10) -> dict[int, list[tuple[int, int, int]]]:
 
     result_hashes = db_service_.get_audio_snapshots_by_hashes([values[0] for values in hashes_])
 
@@ -102,4 +109,15 @@ def detect_audio(hashes_: list[tuple[str, int]], db_service_: DBService) -> dict
     for id_content, timestamp, hash_value in result_hashes:
         dict_audio[id_content].append((timestamp, hash_table[hash_value]))
 
-    return find_durations(dict_audio)
+    result_dict = find_durations(dict_audio, max_diff_s=max_diff_s, min_duration_s=min_duration_s)
+    
+    for id_content, values in result_dict.items():
+        if values[0][0] <= 5:
+            values[0] = (0, values[0][1], values[0][2])
+            
+        if duration_audio - values[len(values) - 1][1] <= 5:
+            values[len(values) - 1] = (values[len(values) - 1][0], duration_audio, values[len(values) - 1][2])
+        
+        values[:] = [values_tuple for values_tuple in values if values_tuple[1] - values_tuple[0] > min_duration_s]
+        
+    return result_dict
