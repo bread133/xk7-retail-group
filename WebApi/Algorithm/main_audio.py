@@ -1,14 +1,14 @@
 from collections import defaultdict
 from datetime import time
 
-from default_logger import logger
-from db_service import DBService
-from db_utilities import load_config
-from audio_utility import get_audio_duration
-from audio_utility import read_audio
-from audio_utility import extract_audio_from_video_source
-from audio_detection import detect_audio
-from audio_create_hashes import create_audio_hashes
+from Algorithm.default_logger import logger
+from Algorithm.db_service import DBService
+from Algorithm.db_utilities import load_config
+from Algorithm.audio_utility import get_audio_duration
+from Algorithm.audio_utility import read_audio
+from Algorithm.audio_utility import extract_audio_from_video_source
+from Algorithm.audio_detection import detect_audio
+from Algorithm.audio_create_hashes import create_audio_hashes
 from time import time
 import sys
 import traceback 

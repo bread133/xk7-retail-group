@@ -1,5 +1,6 @@
 import os
 from typing import List
+import json
 
 from pydantic import ValidationError
 from fastapi import FastAPI, UploadFile, File
@@ -64,13 +65,13 @@ async def upload_video_to_create_fingerprint(file: List[UploadFile] = File(...))
                 diff = result_audio_matching_tuple[2]
                 video_borrowing_dictionary.append(IVideoBorrowing(title_license=title_piracy, title_piracy=result_value.title + result_value.extension, time_license_start=time_license_start, time_license_finish=time_license_finish, time_piracy_start=time_license_start + diff, time_piracy_finish=time_license_finish + diff))
 
-        json = IResponseServerUploadFiles(message="matching is successful", status=HttpStatusSuccessfulCode.Ok, borrowing=video_borrowing_dictionary).model_json_schema()
+        json_ = IResponseServerUploadFiles(message="matching is successful", status=HttpStatusSuccessfulCode.Ok, borrowing=video_borrowing_dictionary).model_json_schema()
         operation_info.change_status(OperationStatus.Done)
 
         if os.path.exists(video_validation_result.upload_video.path):
             os.remove(video_validation_result.upload_video.path)
 
-        dump_json = json.dumps(json, indent=2)
+        dump_json = json.dumps(json_, indent=2)
         return JSONResponse(dump_json)
 
     except ValidationError as e:
