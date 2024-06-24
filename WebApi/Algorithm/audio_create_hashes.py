@@ -3,8 +3,8 @@ import hashlib
 import numpy as np
 from scipy.ndimage import maximum_filter
 from sklearn.neighbors import KDTree
-from Algorithm.audio_utility import get_audio_duration
-from Algorithm.default_logger import logger
+from audio_utility import get_audio_duration
+from default_logger import logger
 
 
 def compute_log_spectrogram(audio_samples: np.ndarray, sample_rate: int, frame_size=2048, hop_size=512) \

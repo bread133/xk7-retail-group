@@ -5,7 +5,7 @@ import psycopg2
 from psycopg2.extras import execute_values
 from psycopg2.extras import LoggingConnection, LoggingCursor
 from psycopg2.extensions import register_adapter, AsIs
-from Algorithm.default_logger import logger
+from default_logger import logger
 
 register_adapter(numpy.int64, AsIs)
 
